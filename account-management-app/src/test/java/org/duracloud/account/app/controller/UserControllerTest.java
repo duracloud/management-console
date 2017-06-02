@@ -129,8 +129,11 @@ public class UserControllerTest extends AmaControllerTestBase {
         EasyMock.expect(accountManagerService.findAccountsByUserId(u.getId()))
                 .andReturn(accounts);
         
+        AmaEndpoint endpoint = EasyMock.createMock(AmaEndpoint.class);
+        EasyMock.expect(endpoint.getDomain()).andReturn("test");
+        userController.setAmaEndpoint(endpoint);
         replayMocks();
-        
+              
         ModelAndView mv = userController.getUser(TEST_USERNAME, request);
         Assert.assertEquals(UserController.USER_ACCOUNTS, mv.getViewName());
         
@@ -153,6 +156,10 @@ public class UserControllerTest extends AmaControllerTestBase {
         obj = map.get("inactiveAccounts");
         Assert.assertNotNull(obj);
         Assert.assertTrue(obj instanceof List);
+        
+        obj = map.get("mcDomain");
+        Assert.assertNotNull(obj);
+        Assert.assertTrue(obj instanceof String);
     }
 
     private Set<AccountInfo> createAccountSet() {
