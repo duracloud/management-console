@@ -23,6 +23,7 @@
     <constructor-arg value="${mc.host}"/>
     <constructor-arg value="${mc.port}"/>
     <constructor-arg value="${mc.context}"/>
+    <constructor-arg value="${mc.domain}"/>
     <constructor-arg value="${notification.user}"/>
     <constructor-arg value="${notification.pass}"/>
     <constructor-arg value="${notification.from-address}"/>

@@ -114,8 +114,8 @@
                     </tr>
                     <tr>
                       <td align="left" valign="middle" class="instructions">
-                      	<a href="https://${a.accountInfo.subdomain}.duracloud.org">
-                      	  <c:out value="${a.accountInfo.subdomain}.duracloud.org"/>
+                      	<a href="https://${a.accountInfo.subdomain}.${mcDomain}">
+                      	  <c:out value="${a.accountInfo.subdomain}.${mcDomain}"/>
                       	</a>
                       </td>
                     </tr>

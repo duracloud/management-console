@@ -25,6 +25,10 @@ public class AmaEndpoint {
         return config.getMcContext();
     }
 
+    public String getDomain() {
+        return config.getMcDomain();
+    }
+    
     public  String getPort() {
         return config.getMcPort();
     }

@@ -99,7 +99,8 @@ public class Notifier {
         sb.append(accountInfo.getAcctName());
         sb.append(" account at https://");
         sb.append(accountInfo.getSubdomain());
-        sb.append(".duracloud.org with the following username: " + user.getUsername() + ".");
+        sb.append(amaEndpoint.getDomain());
+        sb.append(" with the following username: " + user.getUsername() + ".");
         sb.append("\n\n");
         sb.append("The DuraCloud team");
 

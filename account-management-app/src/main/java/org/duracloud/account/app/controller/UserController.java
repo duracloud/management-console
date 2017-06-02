@@ -410,6 +410,7 @@ public class UserController extends AbstractController {
         mav.addObject("activeAccounts", activeAccounts);
         mav.addObject("inactiveAccounts", inactiveAccounts);
         mav.addObject("pendingAccounts", pendingAccounts);
+        mav.addObject("mcDomain", amaEndpoint.getDomain());
     }
 
 

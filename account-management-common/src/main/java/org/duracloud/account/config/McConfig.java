@@ -18,7 +18,8 @@ public class McConfig {
     private String mcHost;
     private String mcPort;
     private String mcContext;
-
+    private String mcDomain;
+    
     private String notificationUser;
     private String notificationPass;
     private String notificationFromAddress;
@@ -33,6 +34,7 @@ public class McConfig {
     public McConfig(String mcHost,
                     String mcPort,
                     String mcContext,
+                    String mcDomain,
                     String notificationUser,
                     String notificationPass,
                     String notificationFromAddress,
@@ -45,6 +47,7 @@ public class McConfig {
         this.mcHost = mcHost;
         this.mcPort = mcPort;
         this.mcContext = mcContext;
+        this.mcDomain = mcDomain;
         this.notificationUser = notificationUser;
         this.notificationPass = notificationPass;
         this.notificationFromAddress = notificationFromAddress;
@@ -68,6 +71,10 @@ public class McConfig {
         return mcContext;
     }
 
+    public String getMcDomain() {
+        return mcDomain;
+    }
+    
     public String getNotificationUser() {
         return notificationUser;
     }
