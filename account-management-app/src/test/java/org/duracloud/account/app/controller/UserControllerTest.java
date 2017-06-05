@@ -156,10 +156,6 @@ public class UserControllerTest extends AmaControllerTestBase {
         obj = map.get("inactiveAccounts");
         Assert.assertNotNull(obj);
         Assert.assertTrue(obj instanceof List);
-        
-        obj = map.get("mcDomain");
-        Assert.assertNotNull(obj);
-        Assert.assertTrue(obj instanceof String);
     }
 
     private Set<AccountInfo> createAccountSet() {
