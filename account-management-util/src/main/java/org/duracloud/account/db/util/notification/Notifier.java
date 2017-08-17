@@ -99,6 +99,7 @@ public class Notifier {
         sb.append(accountInfo.getAcctName());
         sb.append(" account at https://");
         sb.append(accountInfo.getSubdomain());
+        sb.append(".");
         sb.append(amaEndpoint.getDomain());
         sb.append(" with the following username: " + user.getUsername() + ".");
         sb.append("\n\n");
