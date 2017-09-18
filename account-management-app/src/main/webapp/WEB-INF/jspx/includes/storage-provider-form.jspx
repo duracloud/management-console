@@ -62,6 +62,22 @@
                  element="div" />               
               </li>
 	            
+	            <c:if test="${param.storageProviderType eq 'AMAZON_S3'}">
+	              <li>
+	                <form:label
+	                 cssErrorClass="error"
+	                 path="${param.storageProvider}.properties['AWS_REGION']"><spring:message code="amazon.region"/></form:label>
+	                <form:input
+	                 cssErrorClass="error"
+	                 path="${param.storageProvider}.properties['AWS_REGION']"
+	                 onclick="same(this.form)"/>
+	                <form:errors
+	                 path="${param.storageProvider}.properties['AWS_REGION']"
+	                 cssClass="error"
+	                 element="div" />               
+	              </li>
+	            </c:if>
+	            
 	            <c:if test="${param.storageProviderType eq 'DPN' || param.storageProviderType eq 'CHRONOPOLIS'}">
 	              <li>
 	                <form:label
