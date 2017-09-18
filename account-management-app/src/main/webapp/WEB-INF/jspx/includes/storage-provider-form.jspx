@@ -67,10 +67,17 @@
 	                <form:label
 	                 cssErrorClass="error"
 	                 path="${param.storageProvider}.properties['AWS_REGION']"><spring:message code="amazon.region"/></form:label>
-	                <form:input
-	                 cssErrorClass="error"
-	                 path="${param.storageProvider}.properties['AWS_REGION']"
-	                 onclick="same(this.form)"/>
+                    <spring:eval expression="T(com.amazonaws.regions.RegionUtils).getRegions()" var="awsregions" />
+                    <form:select
+                     cssErrorClass="error"
+                     id="${param.storageProvider}.properties['AWS_REGION']"
+                     path="${param.storageProvider}.properties['AWS_REGION']"
+                     onclick="same(this.form)">
+                       <form:option value="" label="" />
+                       <c:forEach items="${awsregions}" var="region">
+                         <form:option value="${region.name}" label="${region.name}" />
+                       </c:forEach>
+                    </form:select>
 	                <form:errors
 	                 path="${param.storageProvider}.properties['AWS_REGION']"
 	                 cssClass="error"
