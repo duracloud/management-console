@@ -13,12 +13,14 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.duracloud.account.app.controller.AccountSetupForm.StorageProviderSettings;
+import org.duracloud.account.config.AmaEndpoint;
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.AccountInfo.AccountStatus;
 import org.duracloud.account.db.model.StorageProviderAccount;
 import org.duracloud.account.db.util.AccountService;
 import org.duracloud.account.db.util.RootAccountManagerService;
 import org.duracloud.account.db.util.error.AccountNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -44,11 +46,14 @@ public class AccountsController extends AbstractRootController{
     public static final String ACCOUNT_SETUP_MAPPING = BY_ID_MAPPING + "/setup";
     private static final String SETUP_ACCOUNT_FORM_KEY = "setupAccountForm";
 
+    @Autowired
+    private AmaEndpoint amaEndpoint;
 
     @RequestMapping("")
     public ModelAndView get() {
         ModelAndView mav = new ModelAndView(BASE_VIEW, "accounts",
                 getRootAccountManagerService().listAllAccounts(null));
+        mav.addObject("mcDomain", amaEndpoint.getDomain());
         return mav;
     }
 
@@ -166,4 +171,7 @@ public class AccountsController extends AbstractRootController{
         
     }
 
+    public void setAmaEndpoint(AmaEndpoint amaEndpoint) {
+        this.amaEndpoint = amaEndpoint;
+    }
  }

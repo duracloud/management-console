@@ -111,7 +111,7 @@
                   </td>
                   <td>
                     <a
-                      href="http://${a.subdomain}.duracloud.org/duradmin"
+                      href="http://${a.subdomain}.${mcDomain}/duradmin"
                       target="_blank"><c:out value="${a.subdomain}"/></a>
                   </td>
 

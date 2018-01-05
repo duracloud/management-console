@@ -51,7 +51,7 @@
           </td>
           <td>
             <a
-             href="http://${accountInfo.subdomain}.duracloud.org/duradmin"
+             href="http://${accountInfo.subdomain}.${mcDomain}/duradmin"
              target="_blank">${accountInfo.subdomain}</a>
           </td>
 

@@ -85,7 +85,7 @@
               <form:input
                cssErrorClass="error"
                path="subdomain" />
-               <strong>.duracloud.org</strong>
+               <strong>.${mcDomain}</strong>
               <form:errors
                path="subdomain"
                cssClass="error"
