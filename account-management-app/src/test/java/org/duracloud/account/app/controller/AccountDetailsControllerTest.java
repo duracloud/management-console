@@ -36,7 +36,7 @@ public class AccountDetailsControllerTest extends AmaControllerTestBase {
         Set<StorageProviderAccount> spa = new HashSet<StorageProviderAccount>();
         StorageProviderAccount storage = new StorageProviderAccount();
         storage.setId(0L);
-        storage.setProviderType(StorageProviderType.RACKSPACE);
+        storage.setProviderType(StorageProviderType.AMAZON_S3);
         storage.setUsername("test");
         storage.setPassword("test");
         spa.add(storage);
@@ -44,7 +44,7 @@ public class AccountDetailsControllerTest extends AmaControllerTestBase {
         this.accountService.removeStorageProvider(EasyMock.anyLong());
         addFlashAttribute();
         replayMocks();
-        this.controller.removeProvider(TEST_ACCOUNT_ID, StorageProviderType.RACKSPACE.toString(), redirectAttributes);
+        this.controller.removeProvider(TEST_ACCOUNT_ID, StorageProviderType.AMAZON_S3.toString(), redirectAttributes);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class AccountDetailsControllerTest extends AmaControllerTestBase {
         Set<StorageProviderAccount> spa = new HashSet<StorageProviderAccount>();
         StorageProviderAccount storage = new StorageProviderAccount();
         storage.setId(0L);
-        storage.setProviderType(StorageProviderType.RACKSPACE);
+        storage.setProviderType(StorageProviderType.AMAZON_S3);
         storage.setUsername("test");
         storage.setPassword("test");
         spa.add(storage);
@@ -60,7 +60,7 @@ public class AccountDetailsControllerTest extends AmaControllerTestBase {
         this.accountService.changePrimaryStorageProvider(EasyMock.anyLong());
         addFlashAttribute();
         replayMocks();
-        this.controller.makePrimary(TEST_ACCOUNT_ID, StorageProviderType.RACKSPACE.toString(), redirectAttributes);
+        this.controller.makePrimary(TEST_ACCOUNT_ID, StorageProviderType.AMAZON_S3.toString(), redirectAttributes);
     }
 
 }

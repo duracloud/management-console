@@ -24,8 +24,6 @@ public class StorageProviderTypeUtil {
         SECONDARY_PROVIDER_TYPES.add(StorageProviderType.AMAZON_GLACIER);
         SECONDARY_PROVIDER_TYPES.add(StorageProviderType.DPN);
         SECONDARY_PROVIDER_TYPES.add(StorageProviderType.CHRONOPOLIS);
-        SECONDARY_PROVIDER_TYPES.add(StorageProviderType.SDSC);
-        SECONDARY_PROVIDER_TYPES.add(StorageProviderType.RACKSPACE);
     }
 
     public static List<StorageProviderType> getAvailableSecondaryTypes() {

@@ -84,8 +84,8 @@ public class TestNewAccountWizard extends AbstractIntegrationTest {
 
         clickAndWait("id=next");
         Assert.assertTrue(isElementPresent("id=fullAccountForm"));
-        //check rackspace box
-        sc.check("css=input[value='RACKSPACE']");
+        //check S3 box
+        sc.check("css=input[value='AMAZON_S3']");
 
         clickAndWait("id=finish");
         assertInfoMessagePresent();
@@ -106,7 +106,7 @@ public class TestNewAccountWizard extends AbstractIntegrationTest {
             isElementPresent("css=input[id='secondaryStorageCredentailsList0.username'][class~='error']"));
 
         //complete form
-        Assert.assertTrue(isTextPresent(StorageProviderType.RACKSPACE.name()));
+        Assert.assertTrue(isTextPresent(StorageProviderType.AMAZON_S3.name()));
 
         sc.type("id=secondaryStorageCredentailsList0.username", "username");
         sc.type("id=secondaryStorageCredentailsList0.password", "password");
