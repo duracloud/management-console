@@ -25,10 +25,15 @@ import org.springframework.core.annotation.Order;
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @PropertySource("${mc.config.file}") //this references the system property.
+/*
+ * Checkstyle suppression is necessary to allow static method and public
+ * constructor, see: https://jira.duraspace.org/browse/DURACLOUD-1190
+ */
+@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class PropertyConfig {
 
     @Bean
-    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() throws IOException {
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() throws IOException {
         PropertySourcesPlaceholderConfigurer p = new PropertySourcesPlaceholderConfigurer();
         return p;
     }
