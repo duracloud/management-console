@@ -19,7 +19,9 @@ import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.StorageProviderAccount;
 import org.duracloud.account.db.repo.DuracloudAccountRepo;
 import org.duracloud.account.db.repo.DuracloudRepoMgr;
+import org.duracloud.account.db.repo.DuracloudStorageProviderAccountRepo;
 import org.duracloud.account.db.util.AccountService;
+import org.duracloud.common.sns.AccountChangeNotifier;
 import org.duracloud.storage.domain.StorageProviderType;
 import org.easymock.EasyMockRunner;
 import org.easymock.EasyMockSupport;
@@ -39,11 +41,81 @@ public class AccountServiceImplTest extends EasyMockSupport {
     }
 
     @Test
+    public void testAddStorageProvider() {
+        DuracloudRepoMgr repoMgr = createMock(DuracloudRepoMgr.class);
+        AmaEndpoint amaEndpoint = createMock(AmaEndpoint.class);
+        AccountInfo acct = createMock(AccountInfo.class);
+        DuracloudAccountRepo accountRepo = createMock(DuracloudAccountRepo.class);
+        AccountChangeNotifier accountChangeNotifier = createMock(AccountChangeNotifier.class);
+
+        String subdomain = "test";
+        expect(acct.getSubdomain()).andReturn(subdomain);
+
+        expect(acct.getSecondaryStorageProviderAccounts())
+            .andReturn(new HashSet<>());
+
+        expect(repoMgr.getAccountRepo())
+            .andReturn(accountRepo);
+        expect(accountRepo.save(acct))
+            .andReturn(null); // output is not used
+
+        replayAll();
+
+        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier);
+        service.addStorageProvider(StorageProviderType.AMAZON_S3);
+    }
+
+    @Test
+    public void testRemoveStorageProvider() {
+        Long storageProviderId = 1000l;
+
+        DuracloudRepoMgr repoMgr = createMock(DuracloudRepoMgr.class);
+        AmaEndpoint amaEndpoint = createMock(AmaEndpoint.class);
+        AccountInfo acct = createMock(AccountInfo.class);
+        DuracloudAccountRepo accountRepo = createMock(DuracloudAccountRepo.class);
+        DuracloudStorageProviderAccountRepo providerAccountRepo = createMock(DuracloudStorageProviderAccountRepo.class);
+        StorageProviderAccount providerAccount = createMock(StorageProviderAccount.class);
+        AccountChangeNotifier accountChangeNotifier = createMock(AccountChangeNotifier.class);
+
+        String subdomain = "test";
+        expect(acct.getSubdomain()).andReturn(subdomain);
+
+        expect(repoMgr.getStorageProviderAccountRepo())
+            .andReturn(providerAccountRepo)
+            .times(2);
+        expect(providerAccountRepo.findOne(storageProviderId))
+            .andReturn(providerAccount);
+
+        Set<StorageProviderAccount> providerAccounts = new HashSet<>();
+        providerAccounts.add(providerAccount);
+        expect(acct.getSecondaryStorageProviderAccounts())
+            .andReturn(providerAccounts);
+
+        expect(repoMgr.getAccountRepo())
+            .andReturn(accountRepo);
+        expect(accountRepo.save(acct))
+            .andReturn(null); // output is not used
+
+        providerAccountRepo.delete(storageProviderId);
+        expectLastCall();
+
+        accountChangeNotifier.storageProvidersChanged(subdomain);
+        expectLastCall();
+
+        replayAll();
+
+        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier);
+        service.removeStorageProvider(storageProviderId);
+    }
+
+    @Test
     public void testChangePrimaryStorageProvider() {
         DuracloudRepoMgr repoMgr = createMock(DuracloudRepoMgr.class);
         AmaEndpoint amaEndpoint = createMock(AmaEndpoint.class);
         AccountInfo acct = createMock(AccountInfo.class);
         DuracloudAccountRepo accountRepo = createMock(DuracloudAccountRepo.class);
+        AccountChangeNotifier accountChangeNotifier = createMock(AccountChangeNotifier.class);
+
         expect(repoMgr.getAccountRepo()).andReturn(accountRepo);
         expect(accountRepo.save(acct)).andReturn(acct);
         Long storageProviderId = 1l;
@@ -63,10 +135,14 @@ public class AccountServiceImplTest extends EasyMockSupport {
         acct.setSecondaryStorageProviderAccounts(eq(result));
         expectLastCall();
 
-        expect(acct.getSubdomain()).andReturn("test");
+        String subdomain = "test";
+        expect(acct.getSubdomain()).andReturn(subdomain);
+
+        accountChangeNotifier.storageProvidersChanged(subdomain);
+        expectLastCall();
 
         replayAll();
-        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr);
+        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier);
 
         service.changePrimaryStorageProvider(storageProviderId);
     }

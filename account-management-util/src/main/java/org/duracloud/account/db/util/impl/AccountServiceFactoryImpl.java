@@ -70,7 +70,8 @@ public class AccountServiceFactoryImpl implements AccountServiceFactory {
     public AccountService getAccount(AccountInfo acctInfo) {
         AccountService acctService = new AccountServiceImpl(amaEndpoint,
                                                             acctInfo,
-                                                            repoMgr);
+                                                            repoMgr,
+                                                            accountChangeNotifier);
 
         Authentication authentication = getAuthentication();
         return new AccountServiceSecuredImpl(acctService,

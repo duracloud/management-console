@@ -23,6 +23,7 @@ import org.duracloud.account.db.repo.DuracloudRightsRepo;
 import org.duracloud.account.db.util.AccountService;
 import org.duracloud.account.db.util.error.DuracloudProviderAccountNotAvailableException;
 import org.duracloud.account.db.util.error.UnsentEmailException;
+import org.duracloud.common.sns.AccountChangeNotifier;
 import org.duracloud.common.util.ChecksumUtil;
 import org.duracloud.notification.Emailer;
 import org.duracloud.storage.domain.StorageProviderType;
@@ -39,16 +40,19 @@ public class AccountServiceImpl implements AccountService {
     private AccountInfo account;
     private DuracloudRepoMgr repoMgr;
     private AmaEndpoint amaEndpoint;
+    private AccountChangeNotifier accountChangeNotifier;
 
     /**
      * @param acct
      */
     public AccountServiceImpl(AmaEndpoint amaEndpoint,
                               AccountInfo acct,
-                              DuracloudRepoMgr repoMgr) {
+                              DuracloudRepoMgr repoMgr,
+                              AccountChangeNotifier accountChangeNotifier) {
         this.amaEndpoint = amaEndpoint;
         this.account = acct;
         this.repoMgr = repoMgr;
+        this.accountChangeNotifier = accountChangeNotifier;
     }
 
     @Override
@@ -90,8 +94,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void addStorageProvider(StorageProviderType storageProviderType) {
-        log.info("Adding storage provider of type {} to account {}",
-                 storageProviderType, account.getSubdomain());
+        String accountId = account.getSubdomain();
+        log.info("Adding storage provider of type {} to account {}", storageProviderType, accountId);
 
         StorageProviderAccount storageProviderAccount = new StorageProviderAccount();
         storageProviderAccount.setProviderType(storageProviderType);
@@ -99,12 +103,15 @@ public class AccountServiceImpl implements AccountService {
         AccountInfo account = retrieveAccountInfo();
         account.getSecondaryStorageProviderAccounts().add(storageProviderAccount);
         saveAccountInfo(account);
+
+        // Note: This change is not propagated to DuraCloud as the StorageProvider is not yet
+        // configured. The propagation occurs when the provider details are provided.
     }
 
     @Override
     public void removeStorageProvider(Long storageProviderId) {
-        log.info("Removing storage provider with ID {} from account {}",
-                 storageProviderId, account.getSubdomain());
+        String accountId = account.getSubdomain();
+        log.info("Removing storage provider with ID {} from account {}", storageProviderId, accountId);
 
         StorageProviderAccount storageProviderAccount =
             repoMgr.getStorageProviderAccountRepo().findOne(storageProviderId);
@@ -113,6 +120,9 @@ public class AccountServiceImpl implements AccountService {
                        .remove(storageProviderAccount)) {
             saveAccountInfo(accountInfo);
             repoMgr.getStorageProviderAccountRepo().delete(storageProviderId);
+
+            // Propagate changes to DuraCloud
+            accountChangeNotifier.storageProvidersChanged(accountId);
         } else {
             throw new DuracloudProviderAccountNotAvailableException(
                 "The storage provider account with ID " + storageProviderId +
@@ -127,26 +137,34 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void changePrimaryStorageProvider(Long storageProviderId) {
-        log.info("Changing primary storage provider to {} from account {}",
-                 storageProviderId, account.getSubdomain());
+        String accountId = account.getSubdomain();
+        log.info("Changing primary storage provider to {} from account {}", storageProviderId, accountId);
 
         AccountInfo accountInfo = retrieveAccountInfo();
         Set<StorageProviderAccount> secondaryAccounts = accountInfo.getSecondaryStorageProviderAccounts();
+        boolean primaryProviderUpdated = false;
         for (StorageProviderAccount secondary : secondaryAccounts) {
             if (secondary.getId().equals(storageProviderId)) {
+
                 secondaryAccounts.remove(secondary);
                 secondaryAccounts.add(accountInfo.getPrimaryStorageProviderAccount());
                 accountInfo.setPrimaryStorageProviderAccount(secondary);
                 accountInfo.setSecondaryStorageProviderAccounts(secondaryAccounts);
                 saveAccountInfo(accountInfo);
-                return;
+
+                primaryProviderUpdated = true;
             }
         }
 
-        throw new DuracloudProviderAccountNotAvailableException(
-            "The storage provider account with ID " + storageProviderId +
-            " is not associated with account with id " + account.getId() +
-            " as a secondary storage provider.");
+        if (primaryProviderUpdated) {
+            // Propagate changes to DuraCloud
+            accountChangeNotifier.storageProvidersChanged(accountId);
+        } else {
+            throw new DuracloudProviderAccountNotAvailableException(
+                "The storage provider account with ID " + storageProviderId +
+                " is not associated with account with id " + accountId +
+                " as a secondary storage provider.");
+        }
     }
 
     @Override
