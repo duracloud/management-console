@@ -61,8 +61,23 @@
                  cssClass="error"
                  element="div" />               
               </li>
-	            
-	            <c:if test="${param.storageProviderType eq 'AMAZON_S3' || param.storageProviderType eq 'AMAZON_GLACIER'}">
+
+							<c:if test="${param.storageProviderRole eq 'secondary'}">
+								<li>
+									<form:label
+										cssErrorClass="error"
+										path="${param.storageProvider}.properties['WRITABLE_BY_NON_ROOT']">
+										<spring:message code="storageprovider.writablebynonrootuser"/>
+									</form:label>
+									<form:checkbox
+										cssErrorClass="error"
+										path="${param.storageProvider}.properties['WRITABLE_BY_NON_ROOT']"
+										value="true"
+										onclick="same(this.form)"/>
+								</li>
+							</c:if>
+
+							<c:if test="${param.storageProviderType eq 'AMAZON_S3' || param.storageProviderType eq 'AMAZON_GLACIER'}">
 	              <li>
 	                <form:label
 	                 cssErrorClass="error"

@@ -68,9 +68,9 @@ public class DuplicationMonitorTest {
         String secondaryId = "secondary-id";
         Map<String, ContentStore> stores = new HashMap<>();
         stores.put(primaryId,
-                   new ContentStoreImpl(null, null, primaryId, null));
+                   new ContentStoreImpl(null, null, primaryId, true, null));
         stores.put(secondaryId,
-                   new ContentStoreImpl(null, null, secondaryId, null));
+                   new ContentStoreImpl(null, null, secondaryId, true,null));
 
         EasyMock.expect(storeManager.getContentStores()).andReturn(stores);
 
