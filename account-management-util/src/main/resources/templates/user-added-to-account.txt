@@ -1,0 +1,8 @@
+email-subject:You are now a member of ${organizationName}'s DuraCloud Account.";
+email-body:Dear ${firstName} ${lastName}:");
+
+You have been added to the DuraCloud account which is managed by ${organizationName}.
+You may now log into the ${accountName} account at https://${subdomain}.${domain}
+with the following username: "${username}".
+
+ --The DuraCloud Team

@@ -7,7 +7,14 @@
  */
 package org.duracloud.account.db.util.notification;
 
+import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.INVITATION_REDEEMED;
+import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.PASSWORD_RESET;
+import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT;
+import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.USER_CREATED;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.duracloud.account.config.AmaEndpoint;
@@ -30,83 +37,61 @@ public class Notifier {
         this.amaEndpoint = amaEndpoint;
     }
 
+    private EmailTemplate getTemplate(EmailTemplate.Templates template) {
+        return new EmailTemplate(template);
+    }
+
+    private Map<String, String> createParameters(DuracloudUser user, AmaEndpoint amaEndpoint) {
+        Map<String,String> params = new HashMap<>();
+        params.put("username", user.getUsername());
+        params.put("firstName", user.getFirstName());
+        params.put("lastName", user.getLastName());
+        params.put("managementConsoleUrl", amaEndpoint.getUrl());
+        return params;
+    }
+
+    private void sendEmail(EmailTemplate template, Map<String, String> parameters, String recipientEmail) {
+        sendEmail(template.formatSubject(parameters), template.formatBody(parameters), recipientEmail);
+    }
+
     public void sendNotificationCreateNewUser(DuracloudUser user) {
-        String subject = "DuraCloud Account Management: Profile Created";
-        StringBuilder message = new StringBuilder();
-        message.append("Thank you for creating your personal user ");
-        message.append("profile with DuraCloud. Your username is ");
-        message.append(user.getUsername());
-        message.append(getProfileBaseMsg());
-        sendEmail(subject, message.toString(), user.getEmail());
+        EmailTemplate template = getTemplate(USER_CREATED);
+        sendEmail(template,  createParameters(user, amaEndpoint), user.getEmail());
     }
 
     public void sendNotificationPasswordReset(DuracloudUser user,
                                               String redemptionCode,
                                               Date date) {
-        String subject = "DuraCloud Account Management: Password Reset";
-        StringBuilder message = new StringBuilder();
-        message.append("You have requested to reset your password.");
-        message.append("Click on this following link to change your password:\n");
-        message.append(amaEndpoint.getUrl() + "/users/change-password/" + redemptionCode + "\n");
-        message.append("This link is good for one password change only and will expire on " + date);
-        message.append("\n\n");
-        message.append("The DuraCloud team");
-        sendEmail(subject, message.toString(), user.getEmail());
-    }
 
-    private String getProfileBaseMsg() {
-        StringBuilder message = new StringBuilder();
-        message.append(".\n\nTo access and/or change your profile ");
-        message.append("information (including your password) or view ");
-        message.append("any associated DuraCloud accounts, please ");
-        message.append("visit: ");
-        message.append(amaEndpoint.getUrl());
-        message.append("\n\n");
-        message.append("The DuraCloud team");
-        return message.toString();
+        EmailTemplate template = getTemplate(PASSWORD_RESET);
+        Map<String,String> parameters = createParameters(user, amaEndpoint);
+        parameters.put("redemptionCode", redemptionCode);
+        parameters.put("expirationDate", date.toString());
+        sendEmail(template,  parameters, user.getEmail());
     }
 
     public void sendNotificationRedeemedInvitation(DuracloudUser user,
                                                    String adminEmail) {
-        String subject = "DuraCloud Account Management: Invitation Redeemed";
-        StringBuilder message = new StringBuilder();
-        message.append("The following user has accepted your DuraCloud ");
-        message.append("account invitation: ");
-        message.append(user.getUsername());
-        message.append(". To edit the permissions of this user, please visit ");
-        message.append(amaEndpoint.getUrl());
-        message.append("\n\n");
-        message.append("The DuraCloud team");
-        sendEmail(subject, message.toString(), adminEmail);
+        EmailTemplate template = getTemplate(INVITATION_REDEEMED);
+        Map<String,String> parameters = createParameters(user, amaEndpoint);
+        sendEmail(template,  parameters, adminEmail);
     }
 
     public void sendNotificationUserAddedToAccount(DuracloudUser user, AccountInfo accountInfo) {
-        String subject = "You are now a member of "
-                         + accountInfo.getOrgName() + "'s DuraCloud Account.";
-        StringBuilder sb = new StringBuilder();
-        sb.append("Dear ");
-        sb.append(user.getFirstName());
-        sb.append(" ");
-        sb.append(user.getLastName());
-        sb.append(":\n\n");
-
-        sb.append("You have been added to the DuraCloud account which is managed by ");
-        sb.append(accountInfo.getOrgName());
+        EmailTemplate template = getTemplate(USER_ADDED_TO_ACCOUNT);
+        Map<String,String> parameters = createParameters(user, amaEndpoint);
+        StringBuilder organizationName = new StringBuilder(accountInfo.getOrgName());
         if (StringUtils.isNotBlank(accountInfo.getDepartment())) {
-            sb.append(", ");
-            sb.append(accountInfo.getDepartment());
+            organizationName.append(", ");
+            organizationName.append(accountInfo.getDepartment());
         }
-        sb.append(".  You may now log into the ");
-        sb.append(accountInfo.getAcctName());
-        sb.append(" account at https://");
-        sb.append(accountInfo.getSubdomain());
-        sb.append(".");
-        sb.append(amaEndpoint.getDomain());
-        sb.append(" with the following username: " + user.getUsername() + ".");
-        sb.append("\n\n");
-        sb.append("The DuraCloud team");
 
-        sendEmail(subject, sb.toString(), user.getEmail());
+        parameters.put("organizationName", organizationName.toString());
+        parameters.put("subdomain", accountInfo.getSubdomain());
+        parameters.put("domain", amaEndpoint.getDomain());
+        parameters.put("accountName", accountInfo.getAcctName());
+
+        sendEmail(template, parameters, user.getEmail());
     }
 
     private void sendEmail(String subject, String message, String emailAddr) {

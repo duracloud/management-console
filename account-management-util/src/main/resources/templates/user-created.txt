@@ -1,0 +1,7 @@
+email-subject: DuraCloud Account Management: Profile Created
+email-body:Thank you for creating your personal user profile with DuraCloud. Your username is "${username}".
+
+To access and/or change your profile information (including your password) or view any associated DuraCloud accounts,
+please visit: ${managementConsoleUrl}.
+
+--The DuraCloud Team
