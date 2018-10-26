@@ -68,4 +68,15 @@
   <definition name="/root/globalproperties/edit" template="/WEB-INF/jspx/root/globalproperties/edit.jspx"
               preparer="globalPreparer"/>
 
+  <definition name="notifications-base" extends="root-base">
+    <put-attribute name="title"/>
+    <put-attribute name="primaryTab" cascade="true" value="notifications"/>
+    <put-attribute name="mainContent" cascade="true"/>
+  </definition>
+
+  <definition name="/root/notifications" template="/WEB-INF/jspx/root/notifications/index.jspx"
+              preparer="globalPreparer"/>
+  <definition name="/root/notifications/edit" template="/WEB-INF/jspx/root/notifications/edit.jspx"
+              preparer="globalPreparer"/>
+
 </tiles-definitions>

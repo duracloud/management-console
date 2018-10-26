@@ -7,10 +7,11 @@
  */
 package org.duracloud.account.db.util.notification;
 
-import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.INVITATION_REDEEMED;
-import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.PASSWORD_RESET;
-import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT;
-import static org.duracloud.account.db.util.notification.EmailTemplate.Templates.USER_CREATED;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.INVITATION_REDEEMED;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.PASSWORD_RESET;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_CREATED;
+import static org.duracloud.account.db.util.util.EmailTemplateUtil.format;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import org.duracloud.account.config.AmaEndpoint;
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.DuracloudUser;
+import org.duracloud.account.db.model.EmailTemplate;
+import org.duracloud.account.db.util.EmailTemplateService;
 import org.duracloud.account.db.util.error.UnsentEmailException;
 import org.duracloud.notification.Emailer;
 
@@ -31,14 +34,12 @@ public class Notifier {
 
     private Emailer emailer;
     private AmaEndpoint amaEndpoint;
+    private EmailTemplateService emailTemplateService;
 
-    public Notifier(Emailer emailer, AmaEndpoint amaEndpoint) {
+    public Notifier(Emailer emailer, AmaEndpoint amaEndpoint, EmailTemplateService emailTemplateService) {
         this.emailer = emailer;
         this.amaEndpoint = amaEndpoint;
-    }
-
-    private EmailTemplate getTemplate(EmailTemplate.Templates template) {
-        return new EmailTemplate(template);
+        this.emailTemplateService = emailTemplateService;
     }
 
     private Map<String, String> createParameters(DuracloudUser user, AmaEndpoint amaEndpoint) {
@@ -51,11 +52,11 @@ public class Notifier {
     }
 
     private void sendEmail(EmailTemplate template, Map<String, String> parameters, String recipientEmail) {
-        sendEmail(template.formatSubject(parameters), template.formatBody(parameters), recipientEmail);
+        sendEmail(format(parameters, template.getSubject()), format(parameters, template.getBody()), recipientEmail);
     }
 
     public void sendNotificationCreateNewUser(DuracloudUser user) {
-        EmailTemplate template = getTemplate(USER_CREATED);
+        EmailTemplate template = emailTemplateService.getTemplate(USER_CREATED);
         sendEmail(template,  createParameters(user, amaEndpoint), user.getEmail());
     }
 
@@ -63,7 +64,7 @@ public class Notifier {
                                               String redemptionCode,
                                               Date date) {
 
-        EmailTemplate template = getTemplate(PASSWORD_RESET);
+        EmailTemplate template = emailTemplateService.getTemplate(PASSWORD_RESET);
         Map<String,String> parameters = createParameters(user, amaEndpoint);
         parameters.put("redemptionCode", redemptionCode);
         parameters.put("expirationDate", date.toString());
@@ -72,13 +73,13 @@ public class Notifier {
 
     public void sendNotificationRedeemedInvitation(DuracloudUser user,
                                                    String adminEmail) {
-        EmailTemplate template = getTemplate(INVITATION_REDEEMED);
+        EmailTemplate template = emailTemplateService.getTemplate(INVITATION_REDEEMED);
         Map<String,String> parameters = createParameters(user, amaEndpoint);
         sendEmail(template,  parameters, adminEmail);
     }
 
     public void sendNotificationUserAddedToAccount(DuracloudUser user, AccountInfo accountInfo) {
-        EmailTemplate template = getTemplate(USER_ADDED_TO_ACCOUNT);
+        EmailTemplate template = emailTemplateService.getTemplate(USER_ADDED_TO_ACCOUNT);
         Map<String,String> parameters = createParameters(user, amaEndpoint);
         StringBuilder organizationName = new StringBuilder(accountInfo.getOrgName());
         if (StringUtils.isNotBlank(accountInfo.getDepartment())) {

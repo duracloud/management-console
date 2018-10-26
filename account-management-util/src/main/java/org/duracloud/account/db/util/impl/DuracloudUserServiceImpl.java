@@ -25,6 +25,7 @@ import org.duracloud.account.db.repo.DuracloudRightsRepo;
 import org.duracloud.account.db.repo.DuracloudUserInvitationRepo;
 import org.duracloud.account.db.repo.DuracloudUserRepo;
 import org.duracloud.account.db.util.DuracloudUserService;
+import org.duracloud.account.db.util.EmailTemplateService;
 import org.duracloud.account.db.util.error.DBNotFoundException;
 import org.duracloud.account.db.util.error.InvalidPasswordException;
 import org.duracloud.account.db.util.error.InvalidRedemptionCodeException;
@@ -58,17 +59,20 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
     private NotificationMgr notificationMgr;
     private Notifier notifier;
     private AmaEndpoint amaEndpoint;
+    private EmailTemplateService emailTemplateService;
     private AccountChangeNotifier accountChangeNotifier;
 
     @Autowired
     public DuracloudUserServiceImpl(DuracloudRepoMgr duracloudRepoMgr,
                                     NotificationMgr notificationMgr,
                                     AmaEndpoint amaEndpoint,
-                                    AccountChangeNotifier accountChangeNotifier) {
+                                    AccountChangeNotifier accountChangeNotifier,
+                                    EmailTemplateService emailTemplateService) {
         this.repoMgr = duracloudRepoMgr;
         this.notificationMgr = notificationMgr;
         this.amaEndpoint = amaEndpoint;
         this.accountChangeNotifier = accountChangeNotifier;
+        this.emailTemplateService = emailTemplateService;
     }
 
     @Override
@@ -511,7 +515,7 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
 
     private Notifier getNotifier() {
         if (null == notifier) {
-            notifier = new Notifier(notificationMgr.getEmailer(), amaEndpoint);
+            notifier = new Notifier(notificationMgr.getEmailer(), amaEndpoint, emailTemplateService);
         }
         return notifier;
     }

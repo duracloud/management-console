@@ -14,6 +14,7 @@ import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.preparer.ViewPreparer;
 import org.duracloud.account.app.controller.DuracloudMillController;
 import org.duracloud.account.app.controller.GlobalPropertiesController;
+import org.duracloud.account.app.controller.NotificationsController;
 import org.springframework.stereotype.Component;
 
 @Component("rootPreparer")
@@ -38,7 +39,7 @@ public class RootPreparer implements ViewPreparer {
             add(new Tab(DuracloudMillController.BASE_MAPPING, "duracloudmill"));
             add(new Tab(GlobalPropertiesController.BASE_MAPPING, "globalproperties"));
             add(new Tab("/root/rootusers", "rootusers"));
-
+            add(new Tab(NotificationsController.BASE_MAPPING, "notifications"));
         }
     }
 

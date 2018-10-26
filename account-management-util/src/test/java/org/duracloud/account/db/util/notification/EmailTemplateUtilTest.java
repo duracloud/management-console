@@ -7,18 +7,24 @@
  */
 package org.duracloud.account.db.util.notification;
 
+import static org.duracloud.account.db.model.EmailTemplate.Templates.INVITATION_REDEEMED;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.PASSWORD_RESET;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_CREATED;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.duracloud.account.db.model.EmailTemplate;
+import org.duracloud.account.db.util.util.EmailTemplateUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author dbernstein
  */
-public class EmailTemplateTest {
+public class EmailTemplateUtilTest {
     private Map<String, String> params = new HashMap<>();
 
     private final String user = "iamauser";
@@ -50,36 +56,36 @@ public class EmailTemplateTest {
 
     @Test
     public void testUserCreated() {
-        test(EmailTemplate.Templates.USER_CREATED, null, new String[] {user, url});
+        test(USER_CREATED, null, new String[] {user, url});
     }
 
     @Test
     public void testInviteRedeemed() {
-        test(EmailTemplate.Templates.INVITATION_REDEEMED, null, new String[] {user, url});
+        test(INVITATION_REDEEMED, null, new String[] {user, url});
     }
 
     @Test
     public void testPasswordReset() {
-        test(EmailTemplate.Templates.PASSWORD_RESET, null, new String[] {redemptionCode, date, url});
+        test(PASSWORD_RESET, null, new String[] {redemptionCode, date, url});
     }
 
     @Test
     public void testUserAddedToAccount() {
-        test(EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT, new String[] {orgName},
+        test(USER_ADDED_TO_ACCOUNT, new String[] {orgName},
              new String[] {first, last, domain, subdomain, accountName, orgName});
     }
 
     private void test(EmailTemplate.Templates template, String[] subjectValues, String[] bodyValues) {
-        EmailTemplate t = new EmailTemplate(template);
+        EmailTemplate t = EmailTemplateUtil.loadDefault(template);
 
-        String subject = t.formatSubject(params);
+        String subject = EmailTemplateUtil.format(params, t.getSubject());
         if (subjectValues != null) {
             for (String value : subjectValues) {
                 assertTrue(subject.contains(value));
             }
         }
 
-        String body = t.formatBody(params);
+        String body = EmailTemplateUtil.format(params, t.getBody());
         for (String value : bodyValues) {
             assertTrue(body.contains(value));
         }

@@ -1013,3 +1013,7 @@ div.global-errors{
 	border-bottom:0 !important;
 	color:#515151 !important;
 }
+
+#emailTemplateForm input, #emailTemplateForm textarea {
+  width:500px;
+}

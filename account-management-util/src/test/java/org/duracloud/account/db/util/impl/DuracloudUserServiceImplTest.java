@@ -13,6 +13,7 @@ import org.duracloud.account.config.AmaEndpoint;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.repo.DuracloudRepoMgr;
 import org.duracloud.account.db.repo.DuracloudUserRepo;
+import org.duracloud.account.db.util.EmailTemplateService;
 import org.duracloud.account.db.util.error.InvalidUsernameException;
 import org.duracloud.account.db.util.error.ReservedPrefixException;
 import org.duracloud.account.db.util.error.UserAlreadyExistsException;
@@ -48,6 +49,9 @@ public class DuracloudUserServiceImplTest extends EasyMockSupport {
 
     @Mock
     private DuracloudUserRepo userRepo;
+
+    @Mock
+    private EmailTemplateService emailTemplateService;
 
     @Mock
     private DuracloudUser user;
@@ -124,6 +128,6 @@ public class DuracloudUserServiceImplTest extends EasyMockSupport {
     }
 
     private DuracloudUserServiceImpl getDuracloudUserService() {
-        return new DuracloudUserServiceImpl(duracloudRepoMgr, notificationMgr, endpoint, notifier);
+        return new DuracloudUserServiceImpl(duracloudRepoMgr, notificationMgr, endpoint, notifier, emailTemplateService);
     }
 }
