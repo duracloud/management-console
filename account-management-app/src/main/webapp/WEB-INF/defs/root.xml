@@ -37,6 +37,13 @@
   </definition>
   <definition name="/root/users" template="/WEB-INF/jspx/root/users/index.jspx"/>
 
+  <!-- root user views -->
+  <definition name="rootusers-base" extends="root-base">
+    <put-attribute name="title"/>
+    <put-attribute name="primaryTab" cascade="true" value="rootusers"/>
+    <put-attribute name="mainContent" cascade="true"/>
+  </definition>
+  <definition name="/root/rootusers" template="/WEB-INF/jspx/root/rootusers/index.jspx"/>
 
   <definition name="duracloudmill-base" extends="root-base">
     <put-attribute name="title"/>

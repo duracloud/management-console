@@ -104,6 +104,34 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         notifyUserChange(accountRights);
     }
 
+    @Override
+    public void setRootUser(Long userId) {
+        log.info("Setting root on user with ID {}", userId);
+
+        // Adding root from the user
+        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
+        user.setRoot(true);
+
+        // Load user rights
+        List<AccountRights> accountRights = getRightsRepo().findByUserId(userId);
+
+        notifyUserChange(accountRights);
+    }
+
+    @Override
+    public void unsetRootUser(Long userId) {
+        log.info("Unsetting root on user with ID {}", userId);
+
+        // Remove root from the user
+        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
+        user.setRoot(false);
+
+        // Load user rights
+        List<AccountRights> accountRights = getRightsRepo().findByUserId(userId);
+
+        notifyUserChange(accountRights);
+    }
+
     private void notifyUserChange(List<AccountRights> accountRights) {
         for (AccountRights right : accountRights) {
             try {
@@ -229,6 +257,22 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
                  || user.getFirstName().startsWith(filter)
                  || user.getLastName().startsWith(filter)
                  || user.getEmail().startsWith(filter))) {
+                users.add(user);
+            }
+        }
+        return users;
+    }
+
+    @Override
+    public Set<DuracloudUser> listAllRootUsers(String filter) {
+        List<DuracloudUser> usersList = getUserRepo().findAll(new Sort("username"));
+        Set<DuracloudUser> users = new LinkedHashSet<DuracloudUser>();
+        for (DuracloudUser user : usersList) {
+            if (user.isRoot() && (filter == null ||
+                    (user.getUsername().startsWith(filter)
+                            || user.getFirstName().startsWith(filter)
+                            || user.getLastName().startsWith(filter)
+                            || user.getEmail().startsWith(filter)))) {
                 users.add(user);
             }
         }

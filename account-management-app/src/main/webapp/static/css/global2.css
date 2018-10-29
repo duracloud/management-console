@@ -701,6 +701,10 @@ li.account:hover {
     padding-bottom:20px;
 }
 
+.rootuser-list {
+    padding-bottom:20px;
+}
+
 .entity-list td {
 	font-size: 13px;
 }

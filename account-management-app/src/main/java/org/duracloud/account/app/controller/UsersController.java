@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.Valid;
 
+import org.duracloud.account.app.model.Account;
+import org.duracloud.account.app.model.User;
+
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.AccountRights;
 import org.duracloud.account.db.model.DuracloudUser;
@@ -156,105 +159,5 @@ public class UsersController extends AbstractRootController {
 
     public void setUserService(DuracloudUserService userService) {
         this.userService = userService;
-    }
-
-    public class User implements Comparable<User> {
-        public User(
-            Long id, String username, String firstName, String lastName,
-            String email, String allowableIPAddressRange, Set<Account> accounts, boolean root) {
-            super();
-            this.id = id;
-            this.username = username;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.email = email;
-            this.allowableIPAddressRange = allowableIPAddressRange;
-            this.accounts = accounts;
-            this.root = root;
-        }
-
-        private Long id;
-        private String username;
-        private String firstName;
-        private String lastName;
-        private String email;
-        private Set<Account> accounts;
-        private String allowableIPAddressRange;
-        private boolean root = false;
-
-        public Long getId() {
-            return id;
-        }
-
-        public boolean isRoot() {
-            return root;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public Set<Account> getAccounts() {
-            return accounts;
-        }
-
-        @Override
-        public int compareTo(User o) {
-            return this.getUsername().compareTo(o.getUsername());
-        }
-
-        public String getAllowableIPAddressRange() {
-            return allowableIPAddressRange;
-        }
-
-    }
-
-    public class Account implements Comparable<Account> {
-        public Account(
-            Long id, String accountName, String subdomain, Role role) {
-            super();
-            this.id = id;
-            this.accountName = accountName;
-            this.subdomain = subdomain;
-            this.role = role;
-        }
-
-        private Long id;
-        private String accountName;
-        private String subdomain;
-        private Role role;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getAccountName() {
-            return accountName;
-        }
-
-        public String getSubdomain() {
-            return subdomain;
-        }
-
-        public Role getRole() {
-            return role;
-        }
-
-        @Override
-        public int compareTo(Account a) {
-            return this.getAccountName().compareTo(a.getAccountName());
-        }
     }
 }

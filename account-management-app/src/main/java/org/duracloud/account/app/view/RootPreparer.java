@@ -37,6 +37,7 @@ public class RootPreparer implements ViewPreparer {
             add(new Tab("/root/users", "users"));
             add(new Tab(DuracloudMillController.BASE_MAPPING, "duracloudmill"));
             add(new Tab(GlobalPropertiesController.BASE_MAPPING, "globalproperties"));
+            add(new Tab("/root/rootusers", "rootusers"));
 
         }
     }

@@ -18,7 +18,7 @@ public class ResourceBundleConfig {
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource m = new ResourceBundleMessageSource();
-        m.setBasenames("global", "root", "user");
+        m.setBasenames("global", "root", "user", "rootuser");
         return m;
     }
 }
