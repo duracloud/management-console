@@ -21,11 +21,16 @@ import org.duracloud.account.db.repo.DuracloudAccountRepo;
 import org.duracloud.account.db.repo.DuracloudRepoMgr;
 import org.duracloud.account.db.repo.DuracloudStorageProviderAccountRepo;
 import org.duracloud.account.db.util.AccountService;
+import org.duracloud.account.db.util.EmailTemplateService;
+import org.duracloud.account.db.util.notification.NotificationMgr;
 import org.duracloud.common.sns.AccountChangeNotifier;
+import org.duracloud.notification.Emailer;
 import org.duracloud.storage.domain.StorageProviderType;
 import org.easymock.EasyMockRunner;
 import org.easymock.EasyMockSupport;
+import org.easymock.Mock;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,6 +39,27 @@ import org.junit.runner.RunWith;
  */
 @RunWith(EasyMockRunner.class)
 public class AccountServiceImplTest extends EasyMockSupport {
+    @Mock
+    private DuracloudRepoMgr repoMgr;
+    @Mock
+    private AmaEndpoint amaEndpoint;
+    @Mock
+    private AccountInfo acct;
+    @Mock
+    private DuracloudAccountRepo accountRepo;
+    @Mock
+    private AccountChangeNotifier accountChangeNotifier;
+    @Mock
+    private NotificationMgr notificationMgr;
+    @Mock
+    private EmailTemplateService emailTemplateService;
+    @Mock
+    private Emailer emailer;
+
+    @Before
+    public void setup() {
+        expect(notificationMgr.getEmailer()).andReturn(emailer);
+    }
 
     @After
     public void tearDown() {
@@ -42,11 +68,6 @@ public class AccountServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testAddStorageProvider() {
-        DuracloudRepoMgr repoMgr = createMock(DuracloudRepoMgr.class);
-        AmaEndpoint amaEndpoint = createMock(AmaEndpoint.class);
-        AccountInfo acct = createMock(AccountInfo.class);
-        DuracloudAccountRepo accountRepo = createMock(DuracloudAccountRepo.class);
-        AccountChangeNotifier accountChangeNotifier = createMock(AccountChangeNotifier.class);
 
         String subdomain = "test";
         expect(acct.getSubdomain()).andReturn(subdomain);
@@ -61,21 +82,21 @@ public class AccountServiceImplTest extends EasyMockSupport {
 
         replayAll();
 
-        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier);
+        AccountService service = createTestObject();
         service.addStorageProvider(StorageProviderType.AMAZON_S3);
+    }
+
+    private AccountService createTestObject() {
+        return new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier, notificationMgr,
+                                      emailTemplateService);
     }
 
     @Test
     public void testRemoveStorageProvider() {
         Long storageProviderId = 1000l;
 
-        DuracloudRepoMgr repoMgr = createMock(DuracloudRepoMgr.class);
-        AmaEndpoint amaEndpoint = createMock(AmaEndpoint.class);
-        AccountInfo acct = createMock(AccountInfo.class);
-        DuracloudAccountRepo accountRepo = createMock(DuracloudAccountRepo.class);
         DuracloudStorageProviderAccountRepo providerAccountRepo = createMock(DuracloudStorageProviderAccountRepo.class);
         StorageProviderAccount providerAccount = createMock(StorageProviderAccount.class);
-        AccountChangeNotifier accountChangeNotifier = createMock(AccountChangeNotifier.class);
 
         String subdomain = "test";
         expect(acct.getSubdomain()).andReturn(subdomain);
@@ -104,17 +125,12 @@ public class AccountServiceImplTest extends EasyMockSupport {
 
         replayAll();
 
-        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier);
+        AccountService service = createTestObject();
         service.removeStorageProvider(storageProviderId);
     }
 
     @Test
     public void testChangePrimaryStorageProvider() {
-        DuracloudRepoMgr repoMgr = createMock(DuracloudRepoMgr.class);
-        AmaEndpoint amaEndpoint = createMock(AmaEndpoint.class);
-        AccountInfo acct = createMock(AccountInfo.class);
-        DuracloudAccountRepo accountRepo = createMock(DuracloudAccountRepo.class);
-        AccountChangeNotifier accountChangeNotifier = createMock(AccountChangeNotifier.class);
 
         expect(repoMgr.getAccountRepo()).andReturn(accountRepo);
         expect(accountRepo.save(acct)).andReturn(acct);
@@ -142,7 +158,7 @@ public class AccountServiceImplTest extends EasyMockSupport {
         expectLastCall();
 
         replayAll();
-        AccountService service = new AccountServiceImpl(amaEndpoint, acct, repoMgr, accountChangeNotifier);
+        AccountService service = createTestObject();
 
         service.changePrimaryStorageProvider(storageProviderId);
     }

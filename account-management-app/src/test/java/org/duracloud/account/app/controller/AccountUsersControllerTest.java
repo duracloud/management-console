@@ -34,7 +34,6 @@ public class AccountUsersControllerTest extends AmaControllerTestBase {
     public void before() throws Exception {
         super.before();
         this.accountUsersController = new AccountUsersController();
-        this.accountUsersController.setNotificationMgr(notificationMgr);
         this.accountUsersController.setAccountManagerService(
             accountManagerService);
         this.accountUsersController.setUserService(userService);
@@ -74,9 +73,7 @@ public class AccountUsersControllerTest extends AmaControllerTestBase {
         setupGenericAccountAndUserServiceMocks(TEST_ACCOUNT_ID);
         UserInvitation ui = createUserInvitation();
 
-        EasyMock.expect(notificationMgr.getEmailer()).andReturn(emailer);
-
-        EasyMock.expect(accountService.inviteUser(ui.getUserEmail(), ui.getAdminUsername(), emailer))
+        EasyMock.expect(accountService.inviteUser(ui.getUserEmail(), ui.getAdminUsername()))
                 .andReturn(ui);
 
         EasyMock.expect(result.hasErrors()).andReturn(false);

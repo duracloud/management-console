@@ -1,6 +1,6 @@
 email-subject:DuraCloud Account Management: Invitation Redeemed
 email-body:The following user has accepted your DuraCloud account invitation: ${username}
 
-To edit the permissions of this user, please visit ${managementConsoleUrl} .
+To edit the permissions of this user, please visit ${managementConsoleUrl}
 
 -- The DuraCloud Team

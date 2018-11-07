@@ -1,0 +1,24 @@
+email-subject:DuraCloud Account Invitation
+email-body:You have been invited to join the DuraCloud account which is managed by ${organizationName}. After accepting
+this invitation, you will be given access to the ${accountName} account and will be able to log in to
+https://${subdomain}.duracloud.org. In order to join, please follow these instructions:
+
+
+1. If you do not have a personal user profile with
+DuraCloud, please create one by clicking on the following link:
+
+     ${createUserProfileUrl}
+
+If you already have a personal user profile with DuraCloud, you may skip this step.
+
+2. Click on this link to log in to the DuraCloud Management Console:
+
+     ${redemptionUrl}
+
+3. After logging in, you should see the details for the DuraCloud account that you now have access to.
+
+
+If you have any issues accepting the invitation or creating your personal user profile, please contact the
+DuraCloud team by emailing your issue to support@duracloud.org.
+
+The DuraCloud team

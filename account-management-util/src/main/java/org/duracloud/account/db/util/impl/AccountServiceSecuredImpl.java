@@ -20,7 +20,6 @@ import org.duracloud.account.db.util.AccountService;
 import org.duracloud.account.db.util.error.AccessDeniedException;
 import org.duracloud.account.db.util.security.AnnotationParser;
 import org.duracloud.account.db.util.security.impl.MethodInvocationImpl;
-import org.duracloud.notification.Emailer;
 import org.duracloud.storage.domain.StorageProviderType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,9 +147,9 @@ public class AccountServiceSecuredImpl implements AccountService {
     }
 
     @Override
-    public UserInvitation inviteUser(String emailAddress, String adminUsername, Emailer emailer) {
-        throwIfAccessDenied(emailAddress, adminUsername, emailer);
-        return accountService.inviteUser(emailAddress, adminUsername, emailer);
+    public UserInvitation inviteUser(String emailAddress, String adminUsername) {
+        throwIfAccessDenied(emailAddress, adminUsername);
+        return accountService.inviteUser(emailAddress, adminUsername);
     }
 
     @Override

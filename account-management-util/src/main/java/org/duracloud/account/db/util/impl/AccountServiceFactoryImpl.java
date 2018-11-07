@@ -12,7 +12,9 @@ import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.repo.DuracloudRepoMgr;
 import org.duracloud.account.db.util.AccountService;
 import org.duracloud.account.db.util.AccountServiceFactory;
+import org.duracloud.account.db.util.EmailTemplateService;
 import org.duracloud.account.db.util.error.AccountNotFoundException;
+import org.duracloud.account.db.util.notification.NotificationMgr;
 import org.duracloud.account.db.util.security.AnnotationParser;
 import org.duracloud.account.db.util.security.SecurityContextUtil;
 import org.duracloud.common.error.DuraCloudRuntimeException;
@@ -43,6 +45,8 @@ public class AccountServiceFactoryImpl implements AccountServiceFactory {
     private AnnotationParser annotationParser;
     private AmaEndpoint amaEndpoint;
     private AccountChangeNotifier accountChangeNotifier;
+    private NotificationMgr notificationMgr;
+    private EmailTemplateService emailTemplateService;
 
     @Autowired
     public AccountServiceFactoryImpl(DuracloudRepoMgr repoMgr,
@@ -50,13 +54,17 @@ public class AccountServiceFactoryImpl implements AccountServiceFactory {
                                      SecurityContextUtil securityContext,
                                      AnnotationParser annotationParser,
                                      AmaEndpoint amaEndpoint,
-                                     AccountChangeNotifier accountChangeNotifier) {
+                                     AccountChangeNotifier accountChangeNotifier,
+                                     NotificationMgr notificationMgr,
+                                     EmailTemplateService emailTemplateService) {
         this.repoMgr = repoMgr;
         this.voter = voter;
         this.securityContext = securityContext;
         this.annotationParser = annotationParser;
         this.amaEndpoint = amaEndpoint;
         this.accountChangeNotifier = accountChangeNotifier;
+        this.notificationMgr = notificationMgr;
+        this.emailTemplateService = emailTemplateService;
     }
 
     @Override
@@ -71,7 +79,9 @@ public class AccountServiceFactoryImpl implements AccountServiceFactory {
         AccountService acctService = new AccountServiceImpl(amaEndpoint,
                                                             acctInfo,
                                                             repoMgr,
-                                                            accountChangeNotifier);
+                                                            accountChangeNotifier,
+                                                            notificationMgr,
+                                                            emailTemplateService);
 
         Authentication authentication = getAuthentication();
         return new AccountServiceSecuredImpl(acctService,

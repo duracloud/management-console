@@ -24,9 +24,7 @@ import org.duracloud.account.db.model.util.DuracloudAccount;
 import org.duracloud.account.db.util.AccountService;
 import org.duracloud.account.db.util.error.AccountNotFoundException;
 import org.duracloud.account.db.util.error.UnsentEmailException;
-import org.duracloud.account.db.util.notification.NotificationMgr;
 import org.duracloud.account.util.EmailAddressesParser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -49,7 +47,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Lazy
 public class AccountUsersController extends AbstractAccountController {
     public static final String ACCOUNT_USERS_VIEW_ID = "account-users";
-    public static final String USERS_INVITE_VIEW_ID = "account-users-invite";
     public static final String ACCOUNT_USERS_EDIT_ID = "account-users-edit";
 
     public static final String EDIT_ACCOUNT_USERS_FORM_KEY = "accountUsersEditForm";
@@ -59,8 +56,6 @@ public class AccountUsersController extends AbstractAccountController {
     public static final String ACCOUNT_USERS_PATH = "/users";
     public static final String ACCOUNT_USERS_MAPPING =
         ACCOUNT_PATH + ACCOUNT_USERS_PATH;
-    public static final String USERS_INVITE_MAPPING =
-        ACCOUNT_USERS_MAPPING + "/invite";
     public static final String USERS_INVITATIONS_DELETE_MAPPING =
         ACCOUNT_USERS_MAPPING + "/invitations/byid/{invitationId}/delete";
     public static final String USERS_DELETE_MAPPING =
@@ -69,9 +64,6 @@ public class AccountUsersController extends AbstractAccountController {
         ACCOUNT_USERS_MAPPING + "/byid/{userId}/edit";
 
     public static final String USERS_KEY = "users";
-
-    @Autowired
-    private NotificationMgr notificationMgr;
 
     @ModelAttribute(INVITATION_FORM_KEY)
     public InvitationForm invitationForm() {
@@ -158,8 +150,7 @@ public class AccountUsersController extends AbstractAccountController {
                 try {
                     UserInvitation ui =
                         service.inviteUser(emailAddress,
-                                           adminUsername,
-                                           notificationMgr.getEmailer());
+                                           adminUsername);
                     String template = "Successfully created user invitation on "
                                       + "account {0} for {1} expiring on {2}";
                     String message =
@@ -483,10 +474,5 @@ public class AccountUsersController extends AbstractAccountController {
         public Role getRole() {
             return role;
         }
-    }
-
-    // This method is only used for test. The actual member is autowired.
-    protected void setNotificationMgr(NotificationMgr notificationMgr) {
-        this.notificationMgr = notificationMgr;
     }
 }

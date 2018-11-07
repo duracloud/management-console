@@ -11,6 +11,7 @@ import static org.duracloud.account.db.model.EmailTemplate.Templates.INVITATION_
 import static org.duracloud.account.db.model.EmailTemplate.Templates.PASSWORD_RESET;
 import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT;
 import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_CREATED;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_INVITATION;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -37,6 +38,8 @@ public class EmailTemplateUtilTest {
     private final String redemptionCode = "mycode";
     private final String orgName = "myorg";
     private final String accountName = "my account";
+    private final String redemptionUrl = "http://myredemptionurl";
+    private final String createUserProfileUrl = "http://createUserProfileUrl";
 
     @Before
     public void setup() {
@@ -51,6 +54,8 @@ public class EmailTemplateUtilTest {
         params.put("domain", domain);
         params.put("subdomain", subdomain);
         params.put("accountName", accountName);
+        params.put("redemptionUrl", redemptionUrl);
+        params.put("createUserProfileUrl", createUserProfileUrl);
 
     }
 
@@ -73,6 +78,12 @@ public class EmailTemplateUtilTest {
     public void testUserAddedToAccount() {
         test(USER_ADDED_TO_ACCOUNT, new String[] {orgName},
              new String[] {first, last, domain, subdomain, accountName, orgName});
+    }
+
+    @Test
+    public void testUserInvitation() {
+        test(USER_INVITATION, null,
+             new String[] {subdomain, accountName, orgName, redemptionUrl, createUserProfileUrl});
     }
 
     private void test(EmailTemplate.Templates template, String[] subjectValues, String[] bodyValues) {

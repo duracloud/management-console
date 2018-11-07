@@ -13,7 +13,6 @@ import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.model.StorageProviderAccount;
 import org.duracloud.account.db.model.UserInvitation;
-import org.duracloud.notification.Emailer;
 import org.duracloud.storage.domain.StorageProviderType;
 import org.springframework.security.access.annotation.Secured;
 
@@ -107,11 +106,10 @@ public interface AccountService {
      * returned by this method, as it may be useful to an administrator.
      *
      * @param emailAddress address at which to invite user
-     * @param emailer      utility for sending mail
      * @return UserInvitation
      */
     @Secured({"role:ROLE_ADMIN, scope:SELF_ACCT"})
-    public UserInvitation inviteUser(String emailAddress, String adminUsername, Emailer emailer);
+    public UserInvitation inviteUser(String emailAddress, String adminUsername);
 
     /**
      * Gets a listing of the user invitations which are associated with this

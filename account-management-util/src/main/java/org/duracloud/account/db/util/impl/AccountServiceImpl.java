@@ -21,11 +21,12 @@ import org.duracloud.account.db.model.UserInvitation;
 import org.duracloud.account.db.repo.DuracloudRepoMgr;
 import org.duracloud.account.db.repo.DuracloudRightsRepo;
 import org.duracloud.account.db.util.AccountService;
+import org.duracloud.account.db.util.EmailTemplateService;
 import org.duracloud.account.db.util.error.DuracloudProviderAccountNotAvailableException;
-import org.duracloud.account.db.util.error.UnsentEmailException;
+import org.duracloud.account.db.util.notification.NotificationMgr;
+import org.duracloud.account.db.util.notification.Notifier;
 import org.duracloud.common.sns.AccountChangeNotifier;
 import org.duracloud.common.util.ChecksumUtil;
-import org.duracloud.notification.Emailer;
 import org.duracloud.storage.domain.StorageProviderType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,9 @@ public class AccountServiceImpl implements AccountService {
     // writes go to both it and the persistence layer.
     private AccountInfo account;
     private DuracloudRepoMgr repoMgr;
-    private AmaEndpoint amaEndpoint;
     private AccountChangeNotifier accountChangeNotifier;
+    private Notifier notifier;
+
 
     /**
      * @param acct
@@ -48,11 +50,13 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl(AmaEndpoint amaEndpoint,
                               AccountInfo acct,
                               DuracloudRepoMgr repoMgr,
-                              AccountChangeNotifier accountChangeNotifier) {
-        this.amaEndpoint = amaEndpoint;
+                              AccountChangeNotifier accountChangeNotifier,
+                              NotificationMgr notificationMgr,
+                              EmailTemplateService emailTemplateService) {
         this.account = acct;
         this.repoMgr = repoMgr;
         this.accountChangeNotifier = accountChangeNotifier;
+        this.notifier = new Notifier(notificationMgr.getEmailer(), amaEndpoint, emailTemplateService);
     }
 
     @Override
@@ -198,8 +202,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public UserInvitation inviteUser(String emailAddress,
-                                     String adminUsername,
-                                     Emailer emailer) {
+                                     String adminUsername) {
         log.info("Inviting user at address {} to account {}",
                  emailAddress, account.getSubdomain());
 
@@ -220,25 +223,9 @@ public class AccountServiceImpl implements AccountService {
                                                            expirationDays,
                                                            redemptionCode);
         repoMgr.getUserInvitationRepo().save(userInvitation);
-        sendEmail(userInvitation, emailer);
+        notifier.sendNotificationUserInvitation(userInvitation);
 
         return userInvitation;
-    }
-
-    private void sendEmail(UserInvitation invitation, Emailer emailer) {
-        try {
-            InvitationMessageFormatter formatter = new InvitationMessageFormatter(invitation, amaEndpoint);
-            emailer.send(formatter.getSubject(),
-                         formatter.getBody(),
-                         invitation.getUserEmail());
-
-        } catch (Exception e) {
-            String msg =
-                "Error: Unable to send email to: " + invitation.getUserEmail();
-
-            log.error(msg, e);
-            throw new UnsentEmailException(msg, e);
-        }
     }
 
     @Override

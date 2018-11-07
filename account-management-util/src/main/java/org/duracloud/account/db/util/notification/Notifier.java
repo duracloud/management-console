@@ -11,6 +11,7 @@ import static org.duracloud.account.db.model.EmailTemplate.Templates.INVITATION_
 import static org.duracloud.account.db.model.EmailTemplate.Templates.PASSWORD_RESET;
 import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_ADDED_TO_ACCOUNT;
 import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_CREATED;
+import static org.duracloud.account.db.model.EmailTemplate.Templates.USER_INVITATION;
 import static org.duracloud.account.db.util.util.EmailTemplateUtil.format;
 
 import java.util.Date;
@@ -22,6 +23,7 @@ import org.duracloud.account.config.AmaEndpoint;
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.model.EmailTemplate;
+import org.duracloud.account.db.model.UserInvitation;
 import org.duracloud.account.db.util.EmailTemplateService;
 import org.duracloud.account.db.util.error.UnsentEmailException;
 import org.duracloud.notification.Emailer;
@@ -47,7 +49,14 @@ public class Notifier {
         params.put("username", user.getUsername());
         params.put("firstName", user.getFirstName());
         params.put("lastName", user.getLastName());
+        params.putAll(createParameters(amaEndpoint));
+        return params;
+    }
+
+    private Map<String, String> createParameters(AmaEndpoint amaEndpoint) {
+        Map<String,String> params = new HashMap<>();
         params.put("managementConsoleUrl", amaEndpoint.getUrl());
+        params.put("domain", amaEndpoint.getDomain());
         return params;
     }
 
@@ -81,16 +90,7 @@ public class Notifier {
     public void sendNotificationUserAddedToAccount(DuracloudUser user, AccountInfo accountInfo) {
         EmailTemplate template = emailTemplateService.getTemplate(USER_ADDED_TO_ACCOUNT);
         Map<String,String> parameters = createParameters(user, amaEndpoint);
-        StringBuilder organizationName = new StringBuilder(accountInfo.getOrgName());
-        if (StringUtils.isNotBlank(accountInfo.getDepartment())) {
-            organizationName.append(", ");
-            organizationName.append(accountInfo.getDepartment());
-        }
-
-        parameters.put("organizationName", organizationName.toString());
-        parameters.put("subdomain", accountInfo.getSubdomain());
-        parameters.put("domain", amaEndpoint.getDomain());
-        parameters.put("accountName", accountInfo.getAcctName());
+        parameters.putAll(createParameters(accountInfo));
 
         sendEmail(template, parameters, user.getEmail());
     }
@@ -106,4 +106,26 @@ public class Notifier {
         }
     }
 
+    public void sendNotificationUserInvitation(UserInvitation invitation) {
+        final EmailTemplate template = emailTemplateService.getTemplate(USER_INVITATION);
+        final Map<String,String> parameters = createParameters(amaEndpoint);
+        parameters.putAll(createParameters(invitation.getAccount()));
+        parameters.put("redemptionUrl",  amaEndpoint.getUrl() + "/users/redeem/" + invitation.getRedemptionCode());
+        parameters.put("createUserProfileUrl", amaEndpoint.getUrl() + "/users/new");
+        sendEmail(template, parameters, invitation.getUserEmail());
+    }
+
+    private Map<String,String> createParameters(AccountInfo accountInfo) {
+        final Map<String,String> parameters = new HashMap<>();
+        final StringBuilder organizationName = new StringBuilder(accountInfo.getOrgName());
+        if (StringUtils.isNotBlank(accountInfo.getDepartment())) {
+            organizationName.append(", ");
+            organizationName.append(accountInfo.getDepartment());
+        }
+
+        parameters.put("organizationName", organizationName.toString());
+        parameters.put("subdomain", accountInfo.getSubdomain());
+        parameters.put("accountName", accountInfo.getAcctName());
+        return parameters;
+    }
 }
