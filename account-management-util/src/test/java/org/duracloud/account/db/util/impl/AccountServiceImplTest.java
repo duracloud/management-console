@@ -138,7 +138,7 @@ public class AccountServiceImplTest extends EasyMockSupport {
         StorageProviderAccount primary =
             createStorageProviderAccount(3l, StorageProviderType.AMAZON_S3);
         StorageProviderAccount secondary =
-            createStorageProviderAccount(storageProviderId, StorageProviderType.DPN);
+            createStorageProviderAccount(storageProviderId, StorageProviderType.CHRONOPOLIS);
         Set<StorageProviderAccount> secondaryaccounts = new HashSet<>();
         secondaryaccounts.add(secondary);
 

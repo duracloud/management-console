@@ -18,20 +18,20 @@
 	              <form:label
 	               cssErrorClass="error"
 	               path="${param.storageProvider}.username"><spring:message code="username"/></form:label>
-	
+
 	              <form:input
 	               id="${param.storageProvider}username"
 	               cssErrorClass="error"
 	               path="${param.storageProvider}.username"
 	               onclick="same(this.form)"
 	               autofocus="true" />
-	               
+
 	              <form:errors
 	               path="${param.storageProvider}.username"
 	               cssClass="error"
-	               element="div" />               
+	               element="div" />
 	            </li>
-	            
+
 	            <li>
 	              <form:label
 	               cssErrorClass="error"
@@ -45,7 +45,7 @@
 	              <form:errors
 	               path="${param.storageProvider}.password"
 	               cssClass="error"
-	               element="div" />               
+	               element="div" />
 	            </li>
 
               <li>
@@ -59,7 +59,7 @@
                 <form:errors
                  path="${param.storageProvider}.storageLimit"
                  cssClass="error"
-                 element="div" />               
+                 element="div" />
               </li>
 
               <c:if test="${param.storageProviderRole eq 'secondary'}">
@@ -99,8 +99,8 @@
 	                 element="div" />
 	              </li>
 	            </c:if>
-	            
-	            <c:if test="${param.storageProviderType eq 'DPN' || param.storageProviderType eq 'CHRONOPOLIS'}">
+
+	            <c:if test="${param.storageProviderType eq 'CHRONOPOLIS'}">
 	              <li>
 	                <form:label
 	                 cssErrorClass="error"
@@ -112,7 +112,7 @@
 	                <form:errors
 	                 path="${param.storageProvider}.properties['SNAPSHOT_USER']"
 	                 cssClass="error"
-	                 element="div" />               
+	                 element="div" />
 	              </li>
 
                 <li>
@@ -126,7 +126,7 @@
                   <form:errors
                    path="${param.storageProvider}.properties['BRIDGE_HOST']"
                    cssClass="error"
-                   element="div" />               
+                   element="div" />
                 </li>
 
                 <li>
@@ -140,7 +140,7 @@
                   <form:errors
                    path="${param.storageProvider}.properties['BRIDGE_PORT']"
                    cssClass="error"
-                   element="div" />               
+                   element="div" />
                 </li>
                 <li>
                   <form:label
@@ -153,13 +153,13 @@
                   <form:errors
                    path="${param.storageProvider}.properties['BRIDGE_USER']"
                    cssClass="error"
-                   element="div" />               
+                   element="div" />
                 </li>
                 <li>
                   <form:label
                    cssErrorClass="error"
                    path="${param.storageProvider}.properties['BRIDGE_PASS']"><spring:message code="bridge.password"/></form:label>
-                  <form:password 
+                  <form:password
                    cssErrorClass="error"
                    showPassword="true"
                    path="${param.storageProvider}.properties['BRIDGE_PASS']"
@@ -167,20 +167,20 @@
                   <form:errors
                    path="${param.storageProvider}.properties['BRIDGE_PASS']"
                    cssClass="error"
-                   element="div" />               
+                   element="div" />
                 </li>
                 <li>
                   <form:label
                    cssErrorClass="error"
                    path="${param.storageProvider}.properties['BRIDGE_MEMBER_ID']"><spring:message code="bridge.member.id"/></form:label>
-                  <form:input 
+                  <form:input
                    cssErrorClass="error"
                    path="${param.storageProvider}.properties['BRIDGE_MEMBER_ID']"
                    onclick="same(this.form)"/>
                   <form:errors
                    path="${param.storageProvider}.properties['BRIDGE_MEMBER_ID']"
                    cssClass="error"
-                   element="div" />               
+                   element="div" />
                 </li>
 
 	            </c:if>
