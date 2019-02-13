@@ -77,7 +77,7 @@
               </li>
               </c:if>
 
-							<c:if test="${param.storageProviderType eq 'AMAZON_S3' || param.storageProviderType eq 'AMAZON_GLACIER'}">
+							<c:if test="${param.storageProviderType eq 'AMAZON_S3' || param.storageProviderType eq 'AMAZON_GLACIER' || param.storageProviderType eq 'CHRONOPOLIS'}">
 	              <li>
 	                <form:label
 	                 cssErrorClass="error"
