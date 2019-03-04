@@ -102,6 +102,10 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         getUserRepo().delete(userId);
 
         notifyUserChange(accountRights);
+
+        if (user.isRoot()) {
+            notifyRootUsersChanged();
+        }
     }
 
     @Override
@@ -111,11 +115,8 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         // Adding root from the user
         DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
         user.setRoot(true);
+        notifyRootUsersChanged();
 
-        // Load user rights
-        List<AccountRights> accountRights = getRightsRepo().findByUserId(userId);
-
-        notifyUserChange(accountRights);
     }
 
     @Override
@@ -125,11 +126,7 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         // Remove root from the user
         DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
         user.setRoot(false);
-
-        // Load user rights
-        List<AccountRights> accountRights = getRightsRepo().findByUserId(userId);
-
-        notifyUserChange(accountRights);
+        notifyRootUsersChanged();
     }
 
     private void notifyUserChange(List<AccountRights> accountRights) {
@@ -139,6 +136,14 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
             } catch (Exception ex) {
                 log.error("failed to notify of user change: " + ex.getMessage(), ex);
             }
+        }
+    }
+
+    private void notifyRootUsersChanged() {
+        try {
+            this.accountChangeNotifier.rootUsersChanged();
+        } catch (Exception ex) {
+            log.error("failed to notify of user change: " + ex.getMessage(), ex);
         }
     }
 
