@@ -101,10 +101,10 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         // Remove the user
         getUserRepo().delete(userId);
 
-        notifyUserChange(accountRights);
-
         if (user.isRoot()) {
             notifyRootUsersChanged();
+        } else {
+            notifyUserChange(accountRights);
         }
     }
 
