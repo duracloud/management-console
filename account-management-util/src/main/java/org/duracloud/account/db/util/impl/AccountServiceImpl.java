@@ -43,7 +43,6 @@ public class AccountServiceImpl implements AccountService {
     private AccountChangeNotifier accountChangeNotifier;
     private Notifier notifier;
 
-
     /**
      * @param acct
      */
