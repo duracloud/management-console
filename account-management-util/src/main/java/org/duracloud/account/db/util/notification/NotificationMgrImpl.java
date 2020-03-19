@@ -34,7 +34,8 @@ public class NotificationMgrImpl implements NotificationMgr {
         log.info("Setting Emailer Type to " + emailerType.toString());
         if (emailerType == EmailerType.SMTP) {
             // SMTP Email
-            this.factory = new SMTPNotificationFactory(mcConfig.getNotificationHost(), Integer.parseInt(mcConfig.getNotificationPort()));
+            this.factory = new SMTPNotificationFactory(mcConfig.getNotificationHost(),
+                                                       Integer.parseInt(mcConfig.getNotificationPort()));
         } else {
             // SES Email
             this.factory = new AmazonNotificationFactory();

@@ -10,7 +10,6 @@ package org.duracloud.account.db.util.impl;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import org.duracloud.account.db.model.EmailTemplate;

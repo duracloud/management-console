@@ -128,6 +128,7 @@ public class DuracloudUserServiceImplTest extends EasyMockSupport {
     }
 
     private DuracloudUserServiceImpl getDuracloudUserService() {
-        return new DuracloudUserServiceImpl(duracloudRepoMgr, notificationMgr, endpoint, notifier, emailTemplateService);
+        return new DuracloudUserServiceImpl(duracloudRepoMgr, notificationMgr, endpoint, notifier,
+                                            emailTemplateService);
     }
 }

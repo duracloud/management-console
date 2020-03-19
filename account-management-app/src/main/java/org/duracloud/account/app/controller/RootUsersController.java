@@ -19,7 +19,6 @@ import org.duracloud.account.app.model.Account;
 import org.duracloud.account.app.model.User;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.util.DuracloudUserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;

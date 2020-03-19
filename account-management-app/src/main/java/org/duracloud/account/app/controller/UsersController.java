@@ -17,7 +17,6 @@ import javax.validation.Valid;
 
 import org.duracloud.account.app.model.Account;
 import org.duracloud.account.app.model.User;
-
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.AccountRights;
 import org.duracloud.account.db.model.DuracloudUser;
