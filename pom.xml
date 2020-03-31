@@ -211,6 +211,7 @@
     <org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>
     <org.springframework.webflow.version>2.4.2.RELEASE</org.springframework.webflow.version>
     <org.springframework.data.jpa.version>1.6.0.RELEASE</org.springframework.data.jpa.version>
+    <jackson.version>2.7.4</jackson.version>
     <slf4j.version>1.7.6</slf4j.version>
   </properties>
 
@@ -801,26 +802,19 @@
         </exclusions>
       </dependency>
 
-      <!-- Needed to indicate specific version to work with amazon-aws jar -->
+      <!-- Needed to indicate specific version to override amazon-aws jar -->
       <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.5</version>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
-      <!-- Needed to indicate specific version to work with amazon-aws jar -->
-      <!--
+
+      <!-- Needed to indicate specific version to override amazon-aws jar -->
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>4.5.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
-      -->
 
       <!-- Spring framework -->
       <dependency>
