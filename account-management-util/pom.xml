@@ -81,16 +81,22 @@
       <scope>compile</scope>
     </dependency>
 
+    <!--External dependencies-->
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-sns</artifactId>
     </dependency>
 
-    <!--External dependencies-->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+
   </dependencies>
 
 </project>
