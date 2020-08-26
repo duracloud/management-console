@@ -51,7 +51,15 @@
       </style>
     </tiles:putAttribute> 
     <tiles:putAttribute name="mainContent" cascade="true">
-  
+      <div class="button-bar">
+        <a
+          id="create-list"
+          href="${currentUri}/create-list"
+          class="button">
+          <i class="pre download"><!--  --></i>
+          <spring:message code="user.createlist"/>
+        </a>
+      </div>
                 <table class="entity-list" id="users" >
                 <thead>
                 <tr>
@@ -97,7 +105,7 @@
                                 <form
                                  action="${currentUri}/byid/${u.id}/reset"
                                  method="post">
-                                  <button 
+                                  <button
                                    class="reset"
                                    type="submit" >
                                   <jsp:include page="/WEB-INF/jspx/includes/csrf.jspx"/>
@@ -141,7 +149,7 @@
               <tr class="expand-child">
                     <td colspan="6"><!--  --></td>
                   <td>
-                    <a 
+                    <a
                       target="_blank"
                       href="${pageContext.request.contextPath}/accounts/byid/${a.id}/users">
                         <c:out value="${a.accountName} (${a.subdomain})"/>

@@ -7,14 +7,21 @@
  */
 package org.duracloud.account.app.controller;
 
+import java.io.IOException;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.duracloud.account.app.model.Account;
 import org.duracloud.account.app.model.User;
 import org.duracloud.account.db.model.AccountInfo;
@@ -22,6 +29,7 @@ import org.duracloud.account.db.model.AccountRights;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.model.Role;
 import org.duracloud.account.db.util.DuracloudUserService;
+import org.duracloud.common.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +51,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UsersController extends AbstractRootController {
     public static final String BASE_MAPPING = RootConsoleHomeController.BASE_MAPPING + "/users";
     private static final String BASE_VIEW = BASE_MAPPING;
+    private static final String CREATE_LIST_VIEW = "create-list";
     public static final String EDIT_ACCOUNT_USERS_FORM_KEY = "accountUsersEditForm";
 
     @Autowired
@@ -150,6 +159,73 @@ public class UsersController extends AbstractRootController {
         }
 
         return createRedirectMav(BASE_VIEW);
+    }
+
+    @RequestMapping(value = CREATE_LIST_VIEW, method = RequestMethod.GET)
+    public String createList(HttpServletResponse response) throws Exception {
+        log.info("Creating DuraCloud users list.");
+        String csvHeaders = "First Name,Last Name,Username,Email,Accounts & Roles\n";
+
+        StringBuffer contentDisposition = new StringBuffer();
+        contentDisposition.append("attachment;");
+        SimpleDateFormat dateFormat =
+            new SimpleDateFormat(DateUtil.DateFormat.PLAIN_FORMAT.getPattern());
+        contentDisposition.append("filename=\"duracloud-users-" + dateFormat.format(new Date()) + ".csv\"");
+        response.setHeader("Content-Disposition", contentDisposition.toString());
+
+        List<String[]> users = this.buildUsersList();
+        log.info("Found {} users.", users.size());
+
+        try {
+            response.getOutputStream().print(csvHeaders);
+            ListIterator<String[]> itr = users.listIterator();
+            while (itr.hasNext()) {
+                String user = StringUtils.join(itr.next(), ",");
+                response.getOutputStream().print(user + "\n");
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        }
+
+        return null;
+    }
+
+    private List<String[]> buildUsersList() {
+        List<String[]> userDataLines = new ArrayList<>();
+        List<String> userData;
+
+        // Get all DuraCloud users
+        Set<DuracloudUser> users = getRootAccountManagerService().listAllUsers(null);
+        for (DuracloudUser user : users) {
+            userData = new ArrayList<String>();
+
+            // Add user metadata
+            userData.add(user.getFirstName());
+            userData.add(user.getLastName());
+            userData.add(user.getUsername());
+            userData.add(user.getEmail());
+
+            // Create list of account:role pairs
+            List<String> accountRolesList = new ArrayList<String>();
+            String accountRoles = "";
+
+            if (user.getAccountRights() != null) {
+                for (AccountRights account : user.getAccountRights()) {
+                    AccountInfo accountInfo = account.getAccount();
+                    accountRolesList.add(accountInfo.getAcctName() + ":" +
+                                         user.getRoleByAcct(account.getAccount().getId()));
+                }
+                String[] accountRolesArray = accountRolesList.toArray(new String[0]);
+                accountRoles = StringUtils.join(accountRolesArray, " || ");
+            }
+            userData.add(accountRoles);
+
+            String[] userDataArray = userData.toArray(new String[0]);
+            userDataLines.add(userDataArray);
+        }
+
+        return userDataLines;
     }
 
     protected DuracloudUserService getUserService() {
