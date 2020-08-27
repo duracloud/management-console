@@ -184,7 +184,7 @@ public class UsersController extends AbstractRootController {
                 response.getOutputStream().print(user + "\n");
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            log.error("Error occurred while downloading DuraCloud users list: " + ex.getMessage(), ex);
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
 
