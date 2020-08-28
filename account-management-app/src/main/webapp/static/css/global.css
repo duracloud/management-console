@@ -113,10 +113,11 @@ h2, h3
 {
 	font-family:Helvetica, Sans-Serif;
 }
-h1 {
+h1, h5 {
 	font-size:1.0em;
 	font-weight:bold;
-	color: #999;
+	color: #DDD !important;
+	background-color: transparent !important;
 	
 }
 
@@ -131,12 +132,6 @@ h4 {
 	font-size:1em;
 	color: #FFF;
 }
-h5{
-	font-size:1.0em;
-	font-weight:bold;
-	color: #999;
-}
-
 
 li a{
 	text-decoration: none;
@@ -347,6 +342,7 @@ div.global-errors{
 {
 		width:531px;
 		background-image: url(../img/logo_top_mc_lg.png);
+		color: transparent;
 }
 
 #dc-app-title
@@ -484,17 +480,14 @@ ing-right:10px;
 
 
 .dc-subgroup, .dc-subgroup a{
-	color:#555;
+	color:#222;
 }
 
 .dc-subgroup a:hover 
 {
-	color:#444;
+	color:#000;
+	font-weight: bold;
 } 
-
-.dc-subgroup .button {
-	color:#bbb;	
-}
 
 .dc-subgroup > h2 > span:last-child{
 	float:right;
@@ -552,9 +545,9 @@ li.account:hover {
 }
 
 .instructions {
-	font-size: 11px;
+	font-size: 12px;
 	margin-bottom: 20px;
-	color: #515151 !important;	
+	color: #212121 !important;
 }
 
 .indent {

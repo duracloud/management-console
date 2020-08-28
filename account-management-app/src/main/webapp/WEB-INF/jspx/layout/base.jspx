@@ -92,14 +92,14 @@
 
 <div id="dc-logo-panel"><c:choose>
 	<c:when test="${(principal == 'anonymousUser') || (empty principal)}">
-		<a href="${pageContext.request.contextPath}" id="dc-logo"><!--  --></a>
+		<a href="${pageContext.request.contextPath}" id="dc-logo"><i class="pre">DURACLOUD MANAGEMENT CONSOLE</i></a>
 	</c:when>
 	<c:otherwise>
 		<sec:authorize
 			access="hasAnyRole('ROLE_USER','ROLE_ADMIN','ROLE_OWNER','ROLE_ROOT')">
 			<sec:authentication property="principal.username" var="username" />
 			<a href="${pageContext.request.contextPath}/users/byid/${username}"
-				id="dc-logo"><!--  --></a>
+				id="dc-logo">DURACLOUD MANAGEMENT CONSOLE</a>
 		</sec:authorize>
 	</c:otherwise>
 </c:choose></div>
