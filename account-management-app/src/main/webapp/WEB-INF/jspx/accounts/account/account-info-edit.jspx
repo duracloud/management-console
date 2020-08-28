@@ -53,11 +53,11 @@
                   </jsp:include>
 
                   <table
-                   class="datatablesimple">
+                   class="datatablesimple" role="presentation">
                     <tr>
                       <td width="25%" align="right" nowrap="nowrap"
                        class="label">
-                        <form:label
+                        <form:label for="org-name-text"
                          cssErrorClass="error"
                          path="orgName">Organization Name:</form:label>
                       </td>
@@ -75,8 +75,8 @@
                     <tr>
                       <td align="right" nowrap="nowrap"
                        class="label">
-                        <form:label
-                         cssErrorClass="error"
+                        <form:label for="department-text"
+                                    cssErrorClass="error"
                          path="department">Department:</form:label>
                       </td>
 
@@ -92,7 +92,7 @@
                     <tr>
                       <td align="right" nowrap="nowrap"
                        class="label">
-                        <form:label
+                        <form:label for="acctName-text"
                          cssErrorClass="error"
                          path="acctName">Account Name:</form:label>
                       </td>

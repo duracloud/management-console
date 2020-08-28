@@ -46,7 +46,7 @@
              class="account-record">
 
 
-              <table width="100%">
+              <table width="100%" role="presentation">
                 <tr>
                   <td><strong class="accountlabel">Account Identification</strong></td>
                   <c:if test="${userRole == 'ROLE_OWNER' || userRole == 'ROLE_ROOT'}">
@@ -67,7 +67,7 @@
                   </td>
                   </c:if>
                 </tr>
-              </table><div style="height:20px"><!--  --></div><table class="datatablesimple">
+              </table><div style="height:20px"><!--  --></div><table class="datatablesimple" role="presentation">
                 <tr>
                   <td width="22%" align="right">Subdomain:</td>
 
@@ -104,17 +104,17 @@
              id="provider-details"
              class="account-record">
 
-              <table width="100%" border="0" cellpadding="4" cellspacing="0" >
+              <table width="100%" border="0" cellpadding="4" cellspacing="0" role="presentation">
                 <tr>
                   <td><strong class="accountlabel">Provider Information</strong></td>
                 </tr>
-              </table><div style="height:20px"><!--  --></div><table border="0">
+              </table><div style="height:20px"><!--  --></div><table border="0" role="presentation">
                 <sec:authorize access="hasAnyRole('ROLE_ROOT')">
                  <tr>
                   <td>
 
                       <div class="providerSelctionRow">
-                    <h3>
+                    <h2>
                       <form:form
                         id="provider-add-form"
                         method="post"
@@ -125,7 +125,7 @@
                         <c:if test="${providerForm.storageProviders != null}">
                             <br />
 
-                          Add a Provider:
+                        <form:label for="provider" path="provider">Add a Provider:</form:label>
                         <form:select
                          id="provider"
                          cssErrorClass="error"
@@ -139,7 +139,7 @@
 
                         </c:if>
                       </form:form>
-                    </h3>
+                    </h2>
                     </div>
               </td>
                 </tr>
@@ -195,7 +195,7 @@
 
 </div>
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
    <tr>
  <td align="right"><a
                 class="button featured"

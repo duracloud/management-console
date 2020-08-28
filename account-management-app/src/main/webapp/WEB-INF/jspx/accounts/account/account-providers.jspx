@@ -38,7 +38,7 @@
                         <c:if test="${providerForm.storageProviders != null}">
                             <br />
 
-                          Add a Provider:
+                        <form:label for="provider" path="provider">Add a Provider:</form:label>
                         <form:select
                          id="provider"
                          cssErrorClass="error"
