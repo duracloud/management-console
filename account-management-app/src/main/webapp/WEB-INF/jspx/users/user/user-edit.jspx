@@ -305,7 +305,7 @@
                  class="button-bar">
 
                   <a
-                   class="button featured"
+                   class="button featured back"
                    id="cancel-button"
                    href="${pageContext.request.contextPath}/users/byid/${user.username}">
                   Back</a>

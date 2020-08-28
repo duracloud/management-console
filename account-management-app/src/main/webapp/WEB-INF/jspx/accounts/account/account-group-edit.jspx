@@ -30,14 +30,16 @@
          name="content">
           <tiles:insertDefinition name="groups-base">
               <tiles:putAttribute name="detail">
-                  <h1>${group.prettyName}</h1>
+                  <h2>${group.prettyName}</h2>
                 <form:form modelAttribute="groupForm" method="post">
                 <jsp:include page="/WEB-INF/jspx/includes/csrf.jspx"/>
                             
                 <table class="shuttle">
                   <tr>
                     <td>
-                      <form:select  size="10" style="width:200px;" path="availableUsernames">
+                      <form:label for="availableUsernames" path="availableUsernames">Available for Selection</form:label>
+                      <br/>
+                      <form:select id="availableUsernames"  size="10" style="width:200px;" path="availableUsernames">
                         <c:forEach items="${availableUsers}" var="u" >
                           <form:option value="${u.username}"><c:out value="${u.firstName} ${u.lastName} (${u.email})"/></form:option>
                         </c:forEach>
@@ -49,7 +51,8 @@
                         <button name="action" type="submit" value="REMOVE"> Remove</button>
                     </td>
                     <td>
-                      <form:select size="10"  style="width:200px;" path="groupUsernames">
+                      <form:label for="groupUsernames" path="groupUsernames">Selected</form:label> <br/>
+                      <form:select id="groupUsernames" size="10" style="width:200px;" path="groupUsernames">
                         <c:if test="${not empty groupUsers}">
                         <c:forEach items="${groupUsers}" var="u" >
                           <form:option value="${u.username}"><c:out value="${u.firstName} ${u.lastName} (${u.email})"/></form:option>

@@ -198,7 +198,7 @@
 <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
    <tr>
  <td align="right"><a
-                class="button featured"
+                class="button featured back"
                 id="cancel-button"
                 href="${pageContext.request.contextPath}/users/byid/${user.username}">
                Back</a>

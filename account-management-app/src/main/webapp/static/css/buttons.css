@@ -260,7 +260,9 @@ span.off i,
 .arw-down-green { background:url(../img/icon_sm_arw_green.gif) no-repeat top right; }
 .outer .help { background-image:url(../img/icon_sm_help_blue.gif); }
 .outer .logoff { background-image:url(../img/icon_sm_logoff_blue.gif); }
-.back { background-image:url(../img/icon_sm_back.png); }
+.back { background-image:url(../img/icon_sm_back.png);
+   color: #1F1F1F !important
+}
 
 /* BUTTONS IN SPECIFIC AREAS *******************************/
 .dc-item button

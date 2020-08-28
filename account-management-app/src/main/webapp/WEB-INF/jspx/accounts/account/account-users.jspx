@@ -53,7 +53,7 @@
 
                   <th align="left">Role</th>
 
-                  <th align="left">Change Role</th>
+                  <th align="left" id="changeRole">Change Role</th>
 
                   <th align="left">
                   </th>
@@ -90,6 +90,7 @@
                               <td align="left">
                                 <select
                                  id="role"
+                                 aria-labelledby="changeRole"
                                  cssErrorClass="error"
                                  name="role" >
                                     <jsp:include 
@@ -230,6 +231,7 @@
                 </tr>
                 <c:forEach
                  var="up"
+
                  items="${pendingUserInvitations}">
                   <tr>
                     <td align="left" valign="middle"><c:out value="${up.email}"/></td>
@@ -276,7 +278,7 @@
             <table width="100%" border="0" cellspacing="0" cellpadding="0"  role="presentation">
                <tr>
              <td align="right"><a
-                   class="button featured"
+                   class="button featured back"
                    id="cancel-button"
                    href="${pageContext.request.contextPath}/users/byid/${user.username}">
                   Back</a></td></tr></table>

@@ -28,12 +28,14 @@
           <div >
           
           <div style="padding:5px">
-            <span style="white-space: nowrap;"> 
+            <span style="white-space: nowrap;">
+            <form:label for="groupName" path="groupName">Enter group name </form:label>:
             <form:input
                     cssErrorClass="error"
                     path="groupName"
+                    id="groupName"
                     style="width:200px; margin-right:10px"
-                    placeholder="Enter a new group name here" />
+                    placeholder="" />
                   <button type="submit" name="action" value="ADD"><i class="pre plus"><!--  --></i>Add New Group</button>
             <button type="submit" name="action" value="REMOVE"><i class="pre trash"><!--  --></i>Remove Selected</button>
             </span>
@@ -56,10 +58,10 @@
                   <table>
                     <tr>
                       <td width="20px">
-                        <form:checkbox path="groupNames" value="${ug.name}" />
+                        <form:checkbox aria-label="${ug.prettyName}" path="groupNames" value="${ug.name}" />
                       </td>
                       <td>
-                        <a href="${pageContext.request.contextPath}/accounts/byid/${accountId}/groups/${ug.name}">  
+                        <a href="${pageContext.request.contextPath}/accounts/byid/${accountId}/groups/${ug.name}">
                           <c:out value="${ug.prettyName}"/>
                         </a>                      
                       </td>
@@ -79,7 +81,7 @@
   </table>
   </div>
   <div align="right">
-        <a class="button featured"
+        <a class="button featured back"
                   id="cancel-button"
                   href="${pageContext.request.contextPath}/users/byid/${user.username}">
                  Back</a>
