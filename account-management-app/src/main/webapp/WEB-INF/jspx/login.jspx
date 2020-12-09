@@ -89,8 +89,6 @@
       </c:if>
     </div>
 
-    <div class="title"><h1>Login</h1></div>
-
     <div class="form login">
       <form
         id="loginForm"

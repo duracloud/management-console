@@ -179,7 +179,6 @@ li a:hover{
 
 
 #footer-content {
-	font-size: 11px;
 	color: #4A4A4A;
 	text-align: left;
 	margin-top: 5px;
@@ -190,11 +189,13 @@ li a:hover{
 }
 
 #footer-content a {
-	font-size: 11px;
 	color: #4A4A4A;
 	text-decoration: underline;
 }
 
+#footer-content, #footer-links {
+   font-size: 14px;
+}
 
 .required:before
 { 
@@ -218,7 +219,7 @@ li a:hover{
 }
 
 .login .horizontal-list li a {
-	font-size: 12px;	
+	font-size: 14px;
 }
 
 .login .horizontal-list li:before {
@@ -925,7 +926,7 @@ form ol ol li {
 
 form label {
   float: left;
-  font-size: 13px;
+  font-size: 14px;
   width: 250px;
   text-align: right;
 }

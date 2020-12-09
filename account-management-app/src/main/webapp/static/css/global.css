@@ -156,7 +156,6 @@ li a:hover{
 }
 
 #footer-content {
-	font-size: 11px;
 	color: #4A4A4A;
 	text-align: left;
 	margin-top: 5px;
@@ -169,9 +168,12 @@ li a:hover{
 }
 
 #footer-content a {
-	font-size: 12px;
 	color: #4A4A4A;
 	text-decoration: underline;
+}
+
+#footer-content, #footer-links {
+   font-size: 14px;
 }
 
 .required:before {
@@ -285,7 +287,7 @@ div.global-errors{
 .outer a
 {
 	color:#4c4c4c;
-	font-size:11px;
+	font-size:14px;
 }
 
 .outer .icon-link:hover
@@ -486,8 +488,7 @@ ing-right:10px;
 .dc-subgroup a:hover 
 {
 	color:#000;
-	font-weight: bold;
-} 
+}
 
 .dc-subgroup > h2 > span:last-child{
 	float:right;
@@ -545,7 +546,7 @@ li.account:hover {
 }
 
 .instructions {
-	font-size: 12px;
+	font-size: 14px;
 	margin-bottom: 20px;
 	color: #212121 !important;
 }
