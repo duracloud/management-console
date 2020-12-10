@@ -12,16 +12,16 @@
     <li><span><c:out value="DuraCloud Management Console v${project.version} ${prefix.revision}${prefix.specialStatus}"/></span>${' '}&#169;<span id="copyright"></span></li>
     <li><a
       target="_blank"
-      href="http://www.duracloud.org">DuraCloud</a></li>
+      href="http://duracloud.org">DuraCloud</a></li>
     <li><a
       target="_blank"
-      href="http://www.duraspace.org">DuraSpace</a></li>
+      href="http://lyrasis.org">LYRASIS</a></li>
     <li><a
       target="_blank"
-      href="https://wiki.duraspace.org/display/DURACLOUD/DuraCloud+Help+Center">Help Center</a></li>
+      href="https://wiki.lyrasis.org/display/DURACLOUD/DuraCloud+Help+Center">Help Center</a></li>
     <li><a
       target="_blank"
-      href="mailto:info@duracloud.org">Contact Us</a></li>
+      href="https://lyrasis.zendesk.com/">Support</a></li>
   </ul>
   </div>
   <script>
@@ -29,7 +29,7 @@
   	    $("#copyright").html(new Date().getUTCFullYear());
   	});
   </script>
-  
+
 
 </jsp:root>
 
