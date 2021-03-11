@@ -103,7 +103,7 @@
               autofocus="true"
               id="username" /></li>
 
-            <li><label>Password</label> <input
+            <li><label for="password">Password</label> <input
               name="password"
               type="password"
               id="password" /></li>
