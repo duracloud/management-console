@@ -10,8 +10,11 @@ package org.duracloud.account.app.controller;
 import javax.validation.Valid;
 
 import org.duracloud.account.db.model.DuracloudMill;
+import org.duracloud.account.db.model.RabbitmqConfig;
 import org.duracloud.account.db.util.DuracloudMillConfigService;
+import org.duracloud.account.db.util.RabbitmqConfigService;
 import org.duracloud.account.util.UserFeedbackUtil;
+import org.duracloud.common.queue.QueueType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,13 @@ public class DuracloudMillController {
         this.duracloudMillConfigService = duracloudMillConfigService;
     }
 
+    @Autowired
+    private RabbitmqConfigService rabbitmqConfigService;
+
+    public void setRabbitmqConfigService(RabbitmqConfigService rabbitmqConfigService) {
+        this.rabbitmqConfigService = rabbitmqConfigService;
+    }
+
     /**
      * @return
      */
@@ -66,12 +76,22 @@ public class DuracloudMillController {
             form.setAuditQueue(entity.getAuditQueue());
             form.setAuditLogSpaceId(entity.getAuditLogSpaceId());
             form.setQueueType(entity.getQueueType());
-            form.setRabbitmqHost(entity.getRabbitmqHost());
-            form.setRabbitmqPort(entity.getRabbitmqPort());
-            form.setRabbitmqVhost(entity.getRabbitmqVhost());
             form.setRabbitmqExchange(entity.getRabbitmqExchange());
-            form.setRabbitmqUsername(entity.getRabbitmqUsername());
-            form.setRabbitmqPassword(entity.getRabbitmqPassword());
+
+            RabbitmqConfig rabbitmqConfig = entity.getRabbitmqConfig();
+            if (rabbitmqConfig != null) {
+                form.setRabbitmqHost(rabbitmqConfig.getHost());
+                form.setRabbitmqPort(rabbitmqConfig.getPort());
+                form.setRabbitmqVhost(rabbitmqConfig.getVhost());
+                form.setRabbitmqUsername(rabbitmqConfig.getUsername());
+                form.setRabbitmqPassword(rabbitmqConfig.getPassword());
+                form.setGlobalPropsRmqConf(rabbitmqConfig.getId() == 1L);
+            }
+
+            // Hidden value to ensure we can't use global props rmq conf
+            // if there is no gloabl props rmq conf available
+            form.setGlobalPropsRmqConfAvailable(rabbitmqConfigService.get(1L) != null);
+
             return form;
         }
     }
@@ -91,6 +111,26 @@ public class DuracloudMillController {
             return new ModelAndView(BASE_MAPPING + "/edit");
         }
 
+        // DuraCloud Mill rabbitmqConfigId can be either 1 or 2 depending on
+        // whether user specifies to use the config set in global properties
+        Long rabbitmqConfigId = null;
+
+        if (form.getQueueType().equalsIgnoreCase(QueueType.RABBITMQ.toString())) {
+            if (form.getGlobalPropsRmqConf()) {
+                // ID of rmq conf for global properties is always 1
+                rabbitmqConfigId = 1L;
+                // No need to set anything in the db
+            } else {
+                rabbitmqConfigId = 2L;
+                this.rabbitmqConfigService.set(rabbitmqConfigId,
+                                               form.getRabbitmqHost(),
+                                               form.getRabbitmqPort(),
+                                               form.getRabbitmqVhost(),
+                                               form.getRabbitmqUsername(),
+                                               form.getRabbitmqPassword());
+            }
+        }
+
         this.duracloudMillConfigService.set(form.getDbHost(),
                                             form.getDbPort(),
                                             form.getDbName(),
@@ -99,12 +139,8 @@ public class DuracloudMillController {
                                             form.getAuditQueue(),
                                             form.getAuditLogSpaceId(),
                                             form.getQueueType(),
-                                            form.getRabbitmqHost(),
-                                            form.getRabbitmqPort(),
-                                            form.getRabbitmqVhost(),
-                                            form.getRabbitmqExchange(),
-                                            form.getRabbitmqUsername(),
-                                            form.getRabbitmqPassword());
+                                            rabbitmqConfigId,
+                                            form.getRabbitmqExchange());
         UserFeedbackUtil.addSuccessFlash("Successfully updated!", redirectAttributes);
         return new ModelAndView(new RedirectView(BASE_MAPPING, true));
     }

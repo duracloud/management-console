@@ -10,7 +10,9 @@ package org.duracloud.account.db.util.impl;
 import java.util.List;
 
 import org.duracloud.account.db.model.GlobalProperties;
+import org.duracloud.account.db.model.RabbitmqConfig;
 import org.duracloud.account.db.repo.GlobalPropertiesRepo;
+import org.duracloud.account.db.repo.RabbitmqConfigRepo;
 import org.duracloud.account.db.util.GlobalPropertiesConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,6 +36,9 @@ public class GlobalPropertiesConfigServiceImpl implements GlobalPropertiesConfig
         return repo;
     }
 
+    @Autowired
+    private RabbitmqConfigRepo rmqRepo;
+
     @Override
     public GlobalProperties get() {
         List<GlobalProperties> globalProperties = repo.findAll();
@@ -46,12 +51,8 @@ public class GlobalPropertiesConfigServiceImpl implements GlobalPropertiesConfig
 
     @Override
     public void set(String notifierType,
-                    String rabbitmqHost,
-                    Integer rabbitmqPort,
-                    String rabbitmqVhost,
+                    Long rabbitmqConfigId,
                     String rabbitmqExchange,
-                    String rabbitmqUsername,
-                    String rabbitmqPassword,
                     String instanceNotificationTopicArn,
                     String cloudFrontAccountId,
                     String cloudFrontKeyId,
@@ -61,13 +62,20 @@ public class GlobalPropertiesConfigServiceImpl implements GlobalPropertiesConfig
             gp = new GlobalProperties();
         }
 
+        RabbitmqConfig rabbitmqConfig = null;
+        if (null != rabbitmqConfigId) {
+            rabbitmqConfig = rmqRepo.findOne(rabbitmqConfigId);
+            if (null == rabbitmqConfig) {
+                rabbitmqConfig = new RabbitmqConfig();
+            }
+            instanceNotificationTopicArn = null;
+        } else {
+            rabbitmqExchange = null;
+        }
+
         gp.setNotifierType(notifierType);
-        gp.setRabbitmqHost(rabbitmqHost);
-        gp.setRabbitmqPort(rabbitmqPort);
-        gp.setRabbitmqVhost(rabbitmqVhost);
+        gp.setRabbitmqConfig(rabbitmqConfig);
         gp.setRabbitmqExchange(rabbitmqExchange);
-        gp.setRabbitmqUsername(rabbitmqUsername);
-        gp.setRabbitmqPassword(rabbitmqPassword);
         gp.setInstanceNotificationTopicArn(instanceNotificationTopicArn);
         gp.setCloudFrontAccountId(cloudFrontAccountId);
         gp.setCloudFrontKeyId(cloudFrontKeyId);

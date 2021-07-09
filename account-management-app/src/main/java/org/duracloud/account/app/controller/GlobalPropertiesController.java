@@ -10,8 +10,11 @@ package org.duracloud.account.app.controller;
 import javax.validation.Valid;
 
 import org.duracloud.account.db.model.GlobalProperties;
+import org.duracloud.account.db.model.RabbitmqConfig;
 import org.duracloud.account.db.util.GlobalPropertiesConfigService;
+import org.duracloud.account.db.util.RabbitmqConfigService;
 import org.duracloud.account.util.UserFeedbackUtil;
+import org.duracloud.common.changenotifier.NotifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +47,14 @@ public class GlobalPropertiesController {
         this.globalPropertiesConfigService = globalPropertiesConfigService;
     }
 
+    @Autowired
+    private RabbitmqConfigService rabbitmqConfigService;
+
+    public void setRabbitmqConfigService(
+        RabbitmqConfigService rabbitmqConfigService) {
+        this.rabbitmqConfigService = rabbitmqConfigService;
+    }
+
     /**
      * @return
      */
@@ -61,16 +72,21 @@ public class GlobalPropertiesController {
             return new GlobalPropertiesForm();
         } else {
             form.setNotifierType(entity.getNotifierType());
-            form.setRabbitmqHost(entity.getRabbitmqHost());
-            form.setRabbitmqPort(entity.getRabbitmqPort());
-            form.setRabbitmqVhost(entity.getRabbitmqVhost());
             form.setRabbitmqExchange(entity.getRabbitmqExchange());
-            form.setRabbitmqUsername(entity.getRabbitmqUsername());
-            form.setRabbitmqPassword(entity.getRabbitmqPassword());
             form.setInstanceNotificationTopicArn(entity.getInstanceNotificationTopicArn());
             form.setCloudFrontAccountId(entity.getCloudFrontAccountId());
             form.setCloudFrontKeyId(entity.getCloudFrontKeyId());
             form.setCloudFrontKeyPath(entity.getCloudFrontKeyPath());
+
+            RabbitmqConfig rabbitmqConfig = entity.getRabbitmqConfig();
+            if (rabbitmqConfig != null) {
+                form.setRabbitmqHost(rabbitmqConfig.getHost());
+                form.setRabbitmqPort(rabbitmqConfig.getPort());
+                form.setRabbitmqVhost(rabbitmqConfig.getVhost());
+                form.setRabbitmqUsername(rabbitmqConfig.getUsername());
+                form.setRabbitmqPassword(rabbitmqConfig.getPassword());
+            }
+
             return form;
         }
     }
@@ -90,13 +106,23 @@ public class GlobalPropertiesController {
         if (hasErrors) {
             return new ModelAndView(BASE_MAPPING + "/edit");
         }
+
+        // GlobalProperties RabbitmqConfig id is always 1
+        // We make it null if we are not setting any RMQ params
+        Long rabbitmqConfigId = null;
+        if (form.getNotifierType().equalsIgnoreCase(NotifierType.RABBITMQ.toString())) {
+            rabbitmqConfigId = 1L;
+            this.rabbitmqConfigService.set(rabbitmqConfigId,
+                                           form.getRabbitmqHost(),
+                                           form.getRabbitmqPort(),
+                                           form.getRabbitmqVhost(),
+                                           form.getRabbitmqUsername(),
+                                           form.getRabbitmqPassword());
+        }
+
         this.globalPropertiesConfigService.set(form.getNotifierType(),
-                                               form.getRabbitmqHost(),
-                                               form.getRabbitmqPort(),
-                                               form.getRabbitmqVhost(),
+                                               rabbitmqConfigId,
                                                form.getRabbitmqExchange(),
-                                               form.getRabbitmqUsername(),
-                                               form.getRabbitmqPassword(),
                                                form.getInstanceNotificationTopicArn(),
                                                form.getCloudFrontAccountId(),
                                                form.getCloudFrontKeyId(),

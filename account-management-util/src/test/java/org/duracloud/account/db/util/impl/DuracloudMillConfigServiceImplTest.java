@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.duracloud.account.db.model.DuracloudMill;
+import org.duracloud.account.db.model.RabbitmqConfig;
 import org.duracloud.account.db.repo.DuracloudMillRepo;
+import org.duracloud.account.db.repo.RabbitmqConfigRepo;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockRunner;
@@ -48,9 +50,15 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
     private static final String rabbitmqExhange = "rmqexchange";
     private static final String rabbitmqUsername = "rmqusername";
     private static final String rabbitmqPassword = "rmqpassword";
+    private static final Long rabbitmqConfigId = 1L;
+
+    private static final RabbitmqConfig rmqConf = new RabbitmqConfig();
 
     @Mock
     private DuracloudMillRepo repo;
+
+    @Mock
+    private RabbitmqConfigRepo rmqRepo;
 
     @TestSubject
     private DuracloudMillConfigServiceImpl subject = new DuracloudMillConfigServiceImpl();
@@ -76,12 +84,13 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
     @Test
     public void testSetNoPreviousSettings() {
         expect(repo.findAll()).andReturn(new ArrayList<DuracloudMill>());
+        expect(rmqRepo.findOne(rabbitmqConfigId)).andReturn(rmqConf);
         Capture<DuracloudMill> saveCapture = Capture.newInstance();
         expect(repo.save(EasyMock.capture(saveCapture))).andReturn(null);
         replayAll();
 
-        subject.set(host, port, name, username, password, auditQueue, auditLogSpaceId, queueType,
-                    rabbitmqHost, rabbitmqPort, rabbitmqVhost, rabbitmqExhange, rabbitmqUsername, rabbitmqPassword);
+        subject.set(host, port, name, username, password, auditQueue,
+                    auditLogSpaceId, queueType, rabbitmqConfigId, rabbitmqExhange);
         DuracloudMill savedMill = saveCapture.getValue();
         assertEquals(host, savedMill.getDbHost());
         assertEquals(port, savedMill.getDbPort());
@@ -91,18 +100,16 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
         assertEquals(auditQueue, savedMill.getAuditQueue());
         assertEquals(auditLogSpaceId, savedMill.getAuditLogSpaceId());
         assertEquals(queueType, savedMill.getQueueType());
-        assertEquals(rabbitmqHost, savedMill.getRabbitmqHost());
-        assertEquals(rabbitmqPort, savedMill.getRabbitmqPort());
-        assertEquals(rabbitmqVhost, savedMill.getRabbitmqVhost());
+        assertEquals(rmqConf, savedMill.getRabbitmqConfig());
         assertEquals(rabbitmqExhange, savedMill.getRabbitmqExchange());
-        assertEquals(rabbitmqUsername, savedMill.getRabbitmqUsername());
-        assertEquals(rabbitmqPassword, savedMill.getRabbitmqPassword());
     }
 
     @Test
     public void testSet() {
         DuracloudMill entity = createMock(DuracloudMill.class);
         expect(repo.findAll()).andReturn(Arrays.asList(entity));
+        RabbitmqConfig rmqEntity = createMock(RabbitmqConfig.class);
+        expect(rmqRepo.findOne(rabbitmqConfigId)).andReturn(rmqEntity);
         expect(repo.save(entity)).andReturn(entity);
 
         entity.setDbHost(host);
@@ -123,22 +130,14 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
         entity.setQueueType(queueType);
         expectLastCall();
 
-        entity.setRabbitmqHost(rabbitmqHost);
-        expectLastCall();
-        entity.setRabbitmqPort(rabbitmqPort);
-        expectLastCall();
-        entity.setRabbitmqVhost(rabbitmqVhost);
+        entity.setRabbitmqConfig(rmqEntity);
         expectLastCall();
         entity.setRabbitmqExchange(rabbitmqExhange);
         expectLastCall();
-        entity.setRabbitmqUsername(rabbitmqUsername);
-        expectLastCall();
-        entity.setRabbitmqPassword(rabbitmqPassword);
-        expectLastCall();
         replayAll();
 
-        subject.set(host, port, name, username, password, auditQueue, auditLogSpaceId, queueType,
-                    rabbitmqHost, rabbitmqPort, rabbitmqVhost, rabbitmqExhange, rabbitmqUsername, rabbitmqPassword);
+        subject.set(host, port, name, username, password, auditQueue,
+                    auditLogSpaceId, queueType, rabbitmqConfigId, rabbitmqExhange);
     }
 
     @After

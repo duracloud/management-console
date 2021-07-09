@@ -79,25 +79,25 @@
 						<td><c:out value="${duracloudMill.auditQueue}"/></td>
 					</tr>
 					<c:if test="${duracloudMill.queueType == 'RabbitMQ'}">
-						<tr>
-							<td><spring:message code="duracloudmill.rabbitmqhost" /></td>
-							<td><c:out value="${duracloudMill.rabbitmqHost}"/></td>
-						</tr>
-						<tr>
-							<td><spring:message code="duracloudmill.rabbitmqport" /></td>
-							<td><c:out value="${duracloudMill.rabbitmqPort}"/></td>
-						</tr>
-						<tr>
-							<td><spring:message code="duracloudmill.rabbitmqvhost" /></td>
-							<td><c:out value="${duracloudMill.rabbitmqVhost}"/></td>
-						</tr>
+                                                <tr>
+                                                        <td><spring:message code="duracloudmill.rabbitmqhost" /></td>
+                                                        <td><c:out value="${duracloudMill.rabbitmqHost}"/></td>
+                                                </tr>
+                                                <tr>
+                                                        <td><spring:message code="duracloudmill.rabbitmqport" /></td>
+                                                        <td><c:out value="${duracloudMill.rabbitmqPort}"/></td>
+                                                </tr>
+                                                <tr>
+                                                        <td><spring:message code="duracloudmill.rabbitmqvhost" /></td>
+                                                        <td><c:out value="${duracloudMill.rabbitmqVhost}"/></td>
+                                                </tr>
+                                                <tr>
+                                                        <td><spring:message code="duracloudmill.rabbitmqusername" /></td>
+                                                        <td><c:out value="${duracloudMill.rabbitmqUsername}"/></td>
+                                                </tr>
 						<tr>
 							<td><spring:message code="duracloudmill.rabbitmqexchange" /></td>
 							<td><c:out value="${duracloudMill.rabbitmqExchange}"/></td>
-						</tr>
-						<tr>
-							<td><spring:message code="duracloudmill.rabbitmqusername" /></td>
-							<td><c:out value="${duracloudMill.rabbitmqUsername}"/></td>
 						</tr>
 					</c:if>
 					<tr>

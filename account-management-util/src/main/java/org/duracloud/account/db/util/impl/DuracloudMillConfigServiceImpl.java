@@ -10,7 +10,9 @@ package org.duracloud.account.db.util.impl;
 import java.util.List;
 
 import org.duracloud.account.db.model.DuracloudMill;
+import org.duracloud.account.db.model.RabbitmqConfig;
 import org.duracloud.account.db.repo.DuracloudMillRepo;
+import org.duracloud.account.db.repo.RabbitmqConfigRepo;
 import org.duracloud.account.db.util.DuracloudMillConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,6 +36,9 @@ public class DuracloudMillConfigServiceImpl implements DuracloudMillConfigServic
         return repo;
     }
 
+    @Autowired
+    private RabbitmqConfigRepo rmqRepo;
+
     @Override
     public DuracloudMill get() {
         List<DuracloudMill> mill = repo.findAll();
@@ -53,15 +58,19 @@ public class DuracloudMillConfigServiceImpl implements DuracloudMillConfigServic
                     String auditQueue,
                     String auditLogSpaceId,
                     String queueType,
-                    String rabbitmqHost,
-                    Integer rabbitmqPort,
-                    String rabbitmqVhost,
-                    String rabbitmqExchange,
-                    String rabbitmqUsername,
-                    String rabbitmqPassword) {
+                    Long rabbitmqConfigId,
+                    String rabbitmqExchange) {
         DuracloudMill dm = get();
         if (null == dm) {
             dm = new DuracloudMill();
+        }
+
+        RabbitmqConfig rabbitmqConfig = null;
+        if (null != rabbitmqConfigId) {
+            rabbitmqConfig = rmqRepo.findOne(rabbitmqConfigId);
+            if (null == rabbitmqConfig) {
+                rabbitmqConfig = new RabbitmqConfig();
+            }
         }
 
         dm.setDbHost(dbHost);
@@ -72,12 +81,8 @@ public class DuracloudMillConfigServiceImpl implements DuracloudMillConfigServic
         dm.setAuditQueue(auditQueue);
         dm.setAuditLogSpaceId(auditLogSpaceId);
         dm.setQueueType(queueType);
-        dm.setRabbitmqHost(rabbitmqHost);
-        dm.setRabbitmqPort(rabbitmqPort);
-        dm.setRabbitmqVhost(rabbitmqVhost);
         dm.setRabbitmqExchange(rabbitmqExchange);
-        dm.setRabbitmqUsername(rabbitmqUsername);
-        dm.setRabbitmqPassword(rabbitmqPassword);
+        dm.setRabbitmqConfig(rabbitmqConfig);
         repo.save(dm);
 
     }

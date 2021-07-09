@@ -7,7 +7,6 @@
  */
 package org.duracloud.account.app.controller;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
 import org.duracloud.common.changenotifier.NotifierType;
@@ -21,9 +20,9 @@ public class GlobalPropertiesForm {
     private String rabbitmqHost;
     private Integer rabbitmqPort = 5672;
     private String rabbitmqVhost = "/";
-    private String rabbitmqExchange;
     private String rabbitmqUsername;
     private String rabbitmqPassword;
+    private String rabbitmqExchange;
     private String instanceNotificationTopicArn;
     @NotNull(message = "You must specify a CloudFront Account Id")
     private String cloudFrontAccountId;
@@ -32,19 +31,8 @@ public class GlobalPropertiesForm {
     @NotNull(message = "You must specify a CloudFront Key Path")
     private String cloudFrontKeyPath;
 
-    private ConstraintViolationException nullConstraintViolationException() {
-        return new ConstraintViolationException("may not be null", null);
-    }
-
-    private Boolean settingRabbitMQ() {
-        return this.notifierType.equalsIgnoreCase(NotifierType.RABBITMQ.toString());
-    }
-
     public void setNotifierType(String notifierType) {
         this.notifierType = notifierType;
-        if (settingRabbitMQ()) {
-            setInstanceNotificationTopicArn(null);
-        }
     }
 
     public String getNotifierType() {
@@ -56,15 +44,7 @@ public class GlobalPropertiesForm {
     }
 
     public void setRabbitmqHost(String rabbitmqHost) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqHost == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqHost = rabbitmqHost;
-            }
-        } else {
-            this.rabbitmqHost = null;
-        }
+        this.rabbitmqHost = rabbitmqHost;
     }
 
     public Integer getRabbitmqPort() {
@@ -72,15 +52,7 @@ public class GlobalPropertiesForm {
     }
 
     public void setRabbitmqPort(Integer rabbitmqPort) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqPort == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqPort = rabbitmqPort;
-            }
-        } else {
-            this.rabbitmqPort = 5672;
-        }
+        this.rabbitmqPort = rabbitmqPort;
     }
 
     public String getRabbitmqVhost() {
@@ -88,15 +60,7 @@ public class GlobalPropertiesForm {
     }
 
     public void setRabbitmqVhost(String rabbitmqVhost) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqVhost == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqVhost = rabbitmqVhost;
-            }
-        } else {
-            this.rabbitmqVhost = "/";
-        }
+        this.rabbitmqVhost = rabbitmqVhost;
     }
 
     public String getRabbitmqExchange() {
@@ -104,15 +68,7 @@ public class GlobalPropertiesForm {
     }
 
     public void setRabbitmqExchange(String rabbitmqExchange) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqExchange == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqExchange = rabbitmqExchange;
-            }
-        } else {
-            this.rabbitmqExchange = null;
-        }
+        this.rabbitmqExchange = rabbitmqExchange;
     }
 
     public String getRabbitmqUsername() {
@@ -120,15 +76,7 @@ public class GlobalPropertiesForm {
     }
 
     public void setRabbitmqUsername(String rabbitmqUsername) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqUsername == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqUsername = rabbitmqUsername;
-            }
-        } else {
-            this.rabbitmqUsername = null;
-        }
+        this.rabbitmqUsername = rabbitmqUsername;
     }
 
     public String getRabbitmqPassword() {
@@ -136,15 +84,7 @@ public class GlobalPropertiesForm {
     }
 
     public void setRabbitmqPassword(String rabbitmqPassword) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqPassword == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqPassword = rabbitmqPassword;
-            }
-        } else {
-            this.rabbitmqPassword = null;
-        }
+        this.rabbitmqPassword = rabbitmqPassword;
     }
 
     public String getInstanceNotificationTopicArn() {

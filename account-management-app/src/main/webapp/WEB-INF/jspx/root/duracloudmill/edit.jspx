@@ -182,6 +182,52 @@
         <li class="rabbitmq-config">
           <form:label
                   cssErrorClass="error"
+                  path="rabbitmqExchange">
+            <spring:message
+                    code="duracloudmill.rabbitmqexchange" />
+          </form:label>
+
+          <form:input
+                  class="rabbitmq-input"
+                  cssErrorClass="error"
+                  path="rabbitmqExchange" />
+
+          <form:errors
+                  path="rabbitmqExchange"
+                  cssClass="error"
+                  element="div" />
+        </li>
+
+        <!-- Hidden value to help determine whether the following checkbox should be displayed-->
+        <form:hidden id="globalPropsRmqConfAvailable" path="globalPropsRmqConfAvailable" />
+
+        <li id="globalPropsRmqConfCheckbox" class="rabbitmq-config">
+          <form:label
+                  cssErrorClass="error"
+                  path="globalPropsRmqConf">
+            <spring:message
+                    code="duracloudmill.useglobalpropsrmqconf" />
+          </form:label>
+
+          <form:checkbox
+                  id="globalPropsRmqConf"
+                  cssErrorClass="error"
+                  path="globalPropsRmqConf">
+          </form:checkbox>
+
+          <form:errors
+                  path="globalPropsRmqConf"
+                  cssClass="error"
+                  element="div" />
+        </li>
+
+        <!--Ensure browser sends false if checkbox is unchecked-->
+        <!--Spring should handle this for us, but it doesn't work-->
+        <input type="hidden" value="on" name="_globalPropsRmqConf"/>
+
+        <li class="rabbitmq-config rabbitmq-host-config">
+          <form:label
+                  cssErrorClass="error"
                   path="rabbitmqHost">
             <spring:message
                     code="duracloudmill.rabbitmqhost" />
@@ -198,7 +244,7 @@
                   element="div" />
         </li>
 
-        <li class="rabbitmq-config">
+        <li class="rabbitmq-config rabbitmq-host-config">
           <form:label
                   cssErrorClass="error"
                   path="rabbitmqPort">
@@ -217,7 +263,7 @@
                   element="div" />
         </li>
 
-        <li class="rabbitmq-config">
+        <li class="rabbitmq-config rabbitmq-host-config">
           <form:label
                   cssErrorClass="error"
                   path="rabbitmqVhost">
@@ -236,27 +282,7 @@
                   element="div" />
         </li>
 
-        <li class="rabbitmq-config">
-          <form:label
-                  cssErrorClass="error"
-                  path="rabbitmqExchange">
-            <spring:message
-                    code="duracloudmill.rabbitmqexchange" />
-          </form:label>
-
-          <form:input
-                  class="rabbitmq-input"
-                  cssErrorClass="error"
-                  path="rabbitmqExchange" />
-
-          <form:errors
-                  path="rabbitmqExchange"
-                  cssClass="error"
-                  element="div" />
-        </li>
-
-
-        <li class="rabbitmq-config">
+        <li class="rabbitmq-config rabbitmq-host-config">
           <form:label
                   cssErrorClass="error"
                   path="rabbitmqUsername">
@@ -276,7 +302,7 @@
         </li>
 
 
-        <li class="rabbitmq-config">
+        <li class="rabbitmq-config rabbitmq-host-config">
           <form:label
                   cssErrorClass="error"
                   path="rabbitmqPassword">

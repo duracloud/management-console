@@ -7,10 +7,7 @@
  */
 package org.duracloud.account.app.controller;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-
-import org.duracloud.common.queue.QueueType;
 
 /**
  * @author Daniel Bernstein
@@ -32,19 +29,29 @@ public class DuracloudMillForm {
     private String auditLogSpaceId;
     @NotNull
     private String queueType;
+    private Boolean globalPropsRmqConfAvailable;
+    private Boolean globalPropsRmqConf;
     private String rabbitmqHost;
     private Integer rabbitmqPort = 5672;
-    private String rabbitmqVhost;
+    private String rabbitmqVhost = "/";
     private String rabbitmqExchange;
     private String rabbitmqUsername;
     private String rabbitmqPassword;
 
-    private ConstraintViolationException nullConstraintViolationException() {
-        return new ConstraintViolationException("may not be null", null);
+    public Boolean getGlobalPropsRmqConfAvailable() {
+        return globalPropsRmqConfAvailable;
     }
 
-    private Boolean settingRabbitMQ() {
-        return this.queueType.equalsIgnoreCase(QueueType.RABBITMQ.toString());
+    public void setGlobalPropsRmqConfAvailable(Boolean globalPropsRmqConfAvailable) {
+        this.globalPropsRmqConfAvailable = globalPropsRmqConfAvailable;
+    }
+
+    public Boolean getGlobalPropsRmqConf() {
+        return globalPropsRmqConf;
+    }
+
+    public void setGlobalPropsRmqConf(Boolean globalPropsRmqConf) {
+        this.globalPropsRmqConf = globalPropsRmqConf;
     }
 
     public String getDbHost() {
@@ -116,15 +123,7 @@ public class DuracloudMillForm {
     }
 
     public void setRabbitmqHost(String rabbitmqHost) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqHost == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqHost = rabbitmqHost;
-            }
-        } else {
-            this.rabbitmqHost = null;
-        }
+        this.rabbitmqHost = rabbitmqHost;
     }
 
     public Integer getRabbitmqPort() {
@@ -132,15 +131,7 @@ public class DuracloudMillForm {
     }
 
     public void setRabbitmqPort(Integer rabbitmqPort) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqPort == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqPort = rabbitmqPort;
-            }
-        } else {
-            this.rabbitmqPort = 5672;
-        }
+        this.rabbitmqPort = rabbitmqPort;
     }
 
     public String getRabbitmqVhost() {
@@ -148,15 +139,7 @@ public class DuracloudMillForm {
     }
 
     public void setRabbitmqVhost(String rabbitmqVhost) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqVhost == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqVhost = rabbitmqVhost;
-            }
-        } else {
-            this.rabbitmqVhost = "/";
-        }
+        this.rabbitmqVhost = rabbitmqVhost;
     }
 
     public String getRabbitmqExchange() {
@@ -164,15 +147,7 @@ public class DuracloudMillForm {
     }
 
     public void setRabbitmqExchange(String rabbitmqExchange) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqExchange == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqExchange = rabbitmqExchange;
-            }
-        } else {
-            this.rabbitmqExchange = null;
-        }
+        this.rabbitmqExchange = rabbitmqExchange;
     }
 
     public String getRabbitmqUsername() {
@@ -180,15 +155,7 @@ public class DuracloudMillForm {
     }
 
     public void setRabbitmqUsername(String rabbitmqUsername) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqUsername == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqUsername = rabbitmqUsername;
-            }
-        } else {
-            this.rabbitmqUsername = null;
-        }
+        this.rabbitmqUsername = rabbitmqUsername;
     }
 
     public String getRabbitmqPassword() {
@@ -196,14 +163,6 @@ public class DuracloudMillForm {
     }
 
     public void setRabbitmqPassword(String rabbitmqPassword) {
-        if (settingRabbitMQ()) {
-            if (rabbitmqPassword == null) {
-                throw nullConstraintViolationException();
-            } else {
-                this.rabbitmqPassword = rabbitmqPassword;
-            }
-        } else {
-            this.rabbitmqPassword = null;
-        }
+        this.rabbitmqPassword = rabbitmqPassword;
     }
 }
