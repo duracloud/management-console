@@ -215,11 +215,11 @@
     <duracloud.artifact.version>7.1.0-SNAPSHOT</duracloud.artifact.version>
     <duracloud.db.version>7.1.0-SNAPSHOT</duracloud.db.version>
     <duraspace-codestyle.version>1.1.0</duraspace-codestyle.version>
-    <aws.version>1.12.24</aws.version>
-    <org.springframework.version>4.2.5.RELEASE</org.springframework.version>
-    <org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>
+    <aws.version>1.12.122</aws.version>
+    <org.springframework.version>4.3.30.RELEASE</org.springframework.version>
+    <org.springframework.security.version>4.2.20.RELEASE</org.springframework.security.version>
     <org.springframework.webflow.version>2.4.2.RELEASE</org.springframework.webflow.version>
-    <org.springframework.data.jpa.version>1.6.0.RELEASE</org.springframework.data.jpa.version>
+    <org.springframework.data.jpa.version>1.11.23.RELEASE</org.springframework.data.jpa.version>
     <jackson.version>2.12.3</jackson.version>
     <slf4j.version>1.7.32</slf4j.version>
     <jaxb.api.version>2.3.1</jaxb.api.version>
