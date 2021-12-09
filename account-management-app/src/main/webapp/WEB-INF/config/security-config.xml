@@ -98,4 +98,10 @@
     access-decision-manager-ref="methodAccessDecisionManager"
     secured-annotations="enabled"/>
 
+  <beans:bean id="allowCharactersHttpFirewall"
+              class="org.springframework.security.web.firewall.StrictHttpFirewall">
+    <beans:property name="allowSemicolon" value="true"/>
+  </beans:bean>
+  <http-firewall ref="allowCharactersHttpFirewall"/>
+
 </beans:beans>
