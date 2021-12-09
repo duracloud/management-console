@@ -35,8 +35,11 @@ public class AmaEndpoint {
     }
 
     public String getUrl() {
-        String proto = getPort().equals("443") ? "https" : "http";
-        return proto + "://" + getHost() + ":" + getPort() + "/" + getCtxt();
+        final var port = getPort();
+        final var proto = port.equals("443") ? "https" : "http";
+        final var portInUrl = port.equals("443") || port.equals("80") ? ""  : ":" + port;
+        final var context = getCtxt();
+        return proto + "://" + getHost() + portInUrl + (context.startsWith("/") ? "" : "/") + context;
     }
 
 }
