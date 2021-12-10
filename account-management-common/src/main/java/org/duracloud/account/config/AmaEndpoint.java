@@ -7,6 +7,8 @@
  */
 package org.duracloud.account.config;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Andrew Woods
  * Date: 3/21/11
@@ -39,7 +41,8 @@ public class AmaEndpoint {
         final var proto = port.equals("443") ? "https" : "http";
         final var portInUrl = port.equals("443") || port.equals("80") ? ""  : ":" + port;
         final var context = getCtxt();
-        return proto + "://" + getHost() + portInUrl + context;
+        final var contextInUrl = context.startsWith("/") || StringUtils.isBlank(context) ? context : "/" + context;
+        return proto + "://" + getHost() + portInUrl + contextInUrl;
     }
 
 }
