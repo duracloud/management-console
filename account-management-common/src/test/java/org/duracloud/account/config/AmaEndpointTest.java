@@ -23,6 +23,10 @@ public class AmaEndpointTest {
 
         endpoint = createConfig("/context");
         assertEquals("http://localhost:8080/context", endpoint.getUrl());
+
+        endpoint = createConfig("context");
+        assertEquals("http://localhost:8080/context", endpoint.getUrl());
+
     }
 
     private AmaEndpoint createConfig(final String context) {
