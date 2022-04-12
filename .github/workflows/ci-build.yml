@@ -15,6 +15,12 @@ jobs:
     - run: echo "This is a CI build of branch ${{ github.ref }} in repository ${{ github.repository }}"
     - run: echo "This job was triggered by a ${{ github.event_name }} event and is running on a ${{ runner.os }} server"
 
+    - name: Set variables 
+      id: vars
+      run: | 
+        echo ::set-output name=project_version::$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
+        echo ::set-output name=is_snapshot_version::${{ endsWith(steps.vars.outputs.project_version, '-SNAPSHOT') }}
+
     # https://github.com/actions/checkout
     - name: Checkout codebase
       uses: actions/checkout@v2
@@ -54,10 +60,10 @@ jobs:
         server-password: SONATYPE_PASSWORD # env variable for sonatype password
         gpg-private-key: ${{ secrets.CODESIGN_GPG_KEY }} # Value of the GPG private key to import
         gpg-passphrase: CODESIGN_GPG_PASSPHRASE # env variable for GPG private key passphrase
-    # ONLY on push to main branch (using Sonatype releases repo)
+    # ONLY on push to tag that is not a snapshot version (using Sonatype releases repo)
     - name: Set up for deploy to Sonatype
       uses: actions/setup-java@v2
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref_type == 'tag' && !(steps.vars.outputs.is_snapshot_version) && github.event_name == 'push'
       with:
         java-version: 11
         distribution: adopt
@@ -67,11 +73,37 @@ jobs:
         gpg-private-key: ${{ secrets.CODESIGN_GPG_KEY }} # Value of the GPG private key to import
         gpg-passphrase: CODESIGN_GPG_PASSPHRASE # env variable for GPG private key passphrase
 
-    # Execute deployment to sonatype (only on push to develop or main branches)
+    # Execute deployment to sonatype (only on push to develop or non snapshot tagged branches)
     - name: Publish to Sonatype
-      if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+      if: github.event_name == 'push' && ((github.ref_type == 'tag' && !(steps.vars.outputs.is_snapshot_version)) || github.ref == 'refs/heads/develop') 
       run: mvn deploy -DreleaseBuild -DskipTests -DskipDeploy --batch-mode
       env:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         CODESIGN_GPG_PASSPHRASE: ${{ secrets.CODESIGN_GPG_PASSPHRASE }}
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref_type == 'tag'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: true 
+        prerelease: true
+    - name: Upload Release Asset
+      if: github.event_name == 'push' && github.ref_type == 'tag'
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./account-management-app/target/ama-${{ steps.vars.outputs.project_version }}.war
+        asset_name: ama-${{ steps.vars.outputs.project_version }}.war
+        asset_content_type: application/zip
