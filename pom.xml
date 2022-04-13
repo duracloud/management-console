@@ -223,6 +223,7 @@
     <jackson.version>2.12.3</jackson.version>
     <slf4j.version>1.7.32</slf4j.version>
     <jaxb.api.version>2.3.1</jaxb.api.version>
+    <sonatype.host>s01.oss.sonatype.org</sonatype.host>
   </properties>
 
   <distributionManagement>
@@ -230,15 +231,14 @@
     <repository>
       <id>sonatype-releases</id>
       <name>Sonatype Release Staging Maven Repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+      <url>https://${sonatype.host}/service/local/staging/deploy/maven2</url>
     </repository>
 
     <snapshotRepository>
       <id>sonatype-snapshots</id>
       <name>Sonatype Snapshots Maven Repository</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://${sonatype.host}/content/repositories/snapshots</url>
     </snapshotRepository>
-
   </distributionManagement>
 
   <repositories>
@@ -255,7 +255,7 @@
     <repository>
       <id>snapshots</id>
       <name>Sonatype Snapshots Maven Repository</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://${sonatype.host}/content/repositories/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -300,9 +300,9 @@
         <extensions>true</extensions>
         <configuration>
           <serverId>sonatype-releases</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <nexusUrl>https://${sonatype.host}/</nexusUrl>
           <!-- Ensures all artifacts are staged together in the same repo -->
-          <stagingProfileId>4f035a66af3dde</stagingProfileId>
+          <stagingProfileId>5fa6dd6036c9f4</stagingProfileId>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
           <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
         </configuration>
