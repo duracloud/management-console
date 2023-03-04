@@ -46,6 +46,14 @@ public class NewUserForm {
     private String securityAnswer;
 
     private String redemptionCode;
+    private String recaptchaResponse;
+    public String getRecaptchaResponse() {
+        return recaptchaResponse;
+    }
+
+    public void setRecaptchaResponse(String recaptchaResponse) {
+        this.recaptchaResponse = recaptchaResponse;
+    }
 
     public String getUsername() {
         return username;

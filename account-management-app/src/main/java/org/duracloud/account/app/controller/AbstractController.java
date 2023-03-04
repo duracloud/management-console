@@ -15,6 +15,7 @@ import org.duracloud.account.db.util.DuracloudUserService;
 import org.duracloud.account.util.UserFeedbackUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,6 +31,13 @@ import org.springframework.web.servlet.view.RedirectView;
 public abstract class AbstractController {
 
     protected Logger log = LoggerFactory.getLogger(AbstractController.class);
+
+    @Value("${recaptcha.siteKey}")
+    private String recaptchaSiteKey;
+
+    @Value("${recaptcha.secret}")
+    private String recaptchaSecret;
+
     public static final String USERS_MAPPING = "/users";
     public static final String USER_MAPPING = "/byid/{username:[a-z0-9.\\-_@]*}";
 
@@ -61,6 +69,15 @@ public abstract class AbstractController {
     @ModelAttribute("userRole")
     public Role getUserRole() {
         return Role.ROLE_USER;
+    }
+
+    @ModelAttribute("recaptchaSiteKey")
+    public String getRecaptchSiteKey() {
+        return recaptchaSiteKey;
+    }
+
+    public String getRecaptchSecret() {
+        return recaptchaSecret;
     }
 
     protected void setUserRights(DuracloudUserService userService,

@@ -7,15 +7,27 @@
  */
 package org.duracloud.account.app.controller;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.duracloud.account.config.AmaEndpoint;
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.AccountInfo.AccountStatus;
@@ -445,12 +457,46 @@ public class UserController extends AbstractController {
     public ModelAndView add(@ModelAttribute(NEW_USER_FORM_KEY) @Valid NewUserForm newUserForm,
                             BindingResult result,
                             Model model,
-                            RedirectAttributes redirectAttributes) throws Exception {
+                            RedirectAttributes redirectAttributes,
+                            HttpServletRequest request
+                            ) throws Exception {
 
         String name = null == newUserForm ? "null" : newUserForm.getUsername();
         log.debug("Add new user: {}", name);
         if (result.hasErrors()) {
             return new ModelAndView(NEW_USER_VIEW, model.asMap());
+        }
+
+        //Check reCAPTCHA
+        var recaptchaResponse = newUserForm.getRecaptchaResponse();
+        log.info("recaptcha response from form = {}", recaptchaResponse);
+
+        final HttpPost httpPost = new HttpPost("https://www.google.com/recaptcha/api/siteverify");
+        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("response", recaptchaResponse));
+        params.add(new BasicNameValuePair("secret", getRecaptchSecret()));
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse response = (CloseableHttpResponse) client
+                     .execute(httpPost)) {
+            var statusLine = response.getStatusLine();
+            log.info("http status from recaptcha = {}", statusLine.toString());
+            var jsonStr = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
+            log.info("http response body from recaptcha = {}", jsonStr);
+            final int statusCode = statusLine.getStatusCode();
+            if (statusCode == HttpStatus.SC_OK) {
+                var map = new ObjectMapper().readValue(jsonStr, Map.class);
+                var success = (boolean) map.get("success");
+                if (!success) {
+                    var mav = new ModelAndView(NEW_USER_VIEW, model.asMap());
+                    return mav;
+                }
+                var challengeTimestamp = map.get("challenge_ts");
+                var hostname = (String) map.get("hostname");
+                var action = (String) map.get("action");
+                var score = (double) map.get("score");
+            }
         }
 
         DuracloudUser user = this.userService.createNewUser(newUserForm.getUsername(),

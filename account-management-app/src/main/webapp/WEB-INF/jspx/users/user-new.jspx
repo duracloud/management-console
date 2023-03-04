@@ -15,9 +15,31 @@
     <tiles:putAttribute
      name="title"
      value="New User Signup" />
-
     <tiles:putAttribute
      name="header-extensions">
+        <script src="https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}"/>
+        <script>
+            $(function(){
+                (function(){
+                    $("input").bind("keypress", function (e) {
+                        if (e.keyCode == 13) {
+                            return false;
+                        }
+                    });
+
+                    $("#create-user-button").click(function(e) {
+                        e.preventDefault();
+                        grecaptcha.ready(function() {
+                            grecaptcha.execute('${recaptchaSiteKey}', {action: 'submit'})
+                                      .then(function(token) {
+                                                $("#recaptcha-response").val(token)
+                                                document.forms["new-user-form"].submit();
+                                      });
+                        });
+                    });
+                })();
+            });
+        </script>
     </tiles:putAttribute>
 
     <tiles:putAttribute
@@ -203,13 +225,14 @@
                   <td align="right">
                       <button
                        id="create-user-button"
-                       class="save"
-                       type="submit">Create Profile</button>
+                       class="save g-recaptcha"
+                       type="button">Create Profile</button>
                       <a
                        class="button"
                        id="cancel-button"
                        href="${pageContext.request.contextPath}">
                       Cancel</a>
+                      <form:hidden path="recaptchaResponse" id="recaptcha-response"/>
                   </td>
                 </tr>
 
