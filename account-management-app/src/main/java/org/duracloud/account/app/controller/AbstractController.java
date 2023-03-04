@@ -7,8 +7,23 @@
  */
 package org.duracloud.account.app.controller;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.model.Role;
 import org.duracloud.account.db.util.DuracloudUserService;
@@ -32,10 +47,13 @@ public abstract class AbstractController {
 
     protected Logger log = LoggerFactory.getLogger(AbstractController.class);
 
-    @Value("${recaptcha.siteKey}")
+    @Value("${recaptcha.enabled:false}")
+    private boolean recaptchaEnabled;
+
+    @Value("${recaptcha.siteKey:placeholderSiteKey}")
     private String recaptchaSiteKey;
 
-    @Value("${recaptcha.secret}")
+    @Value("${recaptcha.secret:placeholderSecret}")
     private String recaptchaSecret;
 
     public static final String USERS_MAPPING = "/users";
@@ -74,6 +92,11 @@ public abstract class AbstractController {
     @ModelAttribute("recaptchaSiteKey")
     public String getRecaptchSiteKey() {
         return recaptchaSiteKey;
+    }
+
+    @ModelAttribute("recaptchaEnabled")
+    protected boolean isRecaptchaEnabled() {
+        return recaptchaEnabled;
     }
 
     public String getRecaptchSecret() {
@@ -153,4 +176,32 @@ public abstract class AbstractController {
         UserFeedbackUtil.addFailureFlash(message, redirectAttributes);
     }
 
+    protected boolean validateRecaptcha(final String recaptchaResponse) throws IOException {
+        log.info("recaptcha response from form = {}", recaptchaResponse);
+        boolean success = false;
+        final HttpPost httpPost = new HttpPost("https://www.google.com/recaptcha/api/siteverify");
+        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("response", recaptchaResponse));
+        params.add(new BasicNameValuePair("secret", getRecaptchSecret()));
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse response = (CloseableHttpResponse) client
+                     .execute(httpPost)) {
+            var statusLine = response.getStatusLine();
+            log.info("http status from recaptcha = {}", statusLine.toString());
+            var jsonStr = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
+            log.info("http response body from recaptcha = {}", jsonStr);
+            final int statusCode = statusLine.getStatusCode();
+            if (statusCode == HttpStatus.SC_OK) {
+                var map = new ObjectMapper().readValue(jsonStr, Map.class);
+                success = (boolean) map.get("success");
+                var challengeTimestamp = map.get("challenge_ts");
+                var hostname = (String) map.get("hostname");
+                var action = (String) map.get("action");
+                var score = (double) map.get("score");
+            }
+        }
+        return success;
+    }
 }

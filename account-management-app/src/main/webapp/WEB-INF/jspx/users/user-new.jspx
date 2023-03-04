@@ -17,29 +17,46 @@
      value="New User Signup" />
     <tiles:putAttribute
      name="header-extensions">
-        <script src="https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}"/>
-        <script>
-            $(function(){
-                (function(){
-                    $("input").bind("keypress", function (e) {
-                        if (e.keyCode == 13) {
-                            return false;
-                        }
-                    });
+    <c:choose>
+        <c:when test="${recaptchaEnabled}">
+            <script src="https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}"><!-- comment --></script>
+            <script>
+                $(function() {
+                (function() {
+                var test = "test";
+                $("input").bind("keypress", function (e) {
+                if (e.keyCode == 13) {
+                return false;
+                }
+                });
 
-                    $("#create-user-button").click(function(e) {
-                        e.preventDefault();
-                        grecaptcha.ready(function() {
-                            grecaptcha.execute('${recaptchaSiteKey}', {action: 'submit'})
-                                      .then(function(token) {
-                                                $("#recaptcha-response").val(token)
-                                                document.forms["new-user-form"].submit();
-                                      });
-                        });
-                    });
+                $("#create-user-button").click(function(e) {
+                e.preventDefault();
+                grecaptcha.ready(function() {
+                grecaptcha.execute('${recaptchaSiteKey}', {action: 'submit'})
+                .then(function(token) {
+                $("#recaptcha-response").val(token)
+                document.forms["new-user-form"].submit();
+                });
+                });
+                });
                 })();
+                });
+            </script>
+        </c:when>
+        <c:otherwise>
+            <script>
+            $(function() {
+            (function() {
+            $("#create-user-button").click(function(e) {
+            e.preventDefault();
+            document.forms["new-user-form"].submit();
             });
-        </script>
+            })();
+            });
+            </script>
+        </c:otherwise>
+    </c:choose>
     </tiles:putAttribute>
 
     <tiles:putAttribute
