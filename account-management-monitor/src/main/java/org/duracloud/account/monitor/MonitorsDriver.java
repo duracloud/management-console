@@ -112,7 +112,7 @@ public class MonitorsDriver {
             error.flush();
             IOUtils.closeQuietly(out);
 
-            String msg = new String(out.toByteArray());
+            String msg = out.toString();
             log.error(msg);
             sendEmail("Management Console Monitors Error", msg);
         }

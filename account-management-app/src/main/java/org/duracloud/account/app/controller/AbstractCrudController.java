@@ -92,7 +92,7 @@ public abstract class AbstractCrudController<T> extends AbstractController {
     public ModelAndView edit(@PathVariable Long id) {
 
         T form = getFormById(id);
-        log.debug("retrieved form: id={} -> form=", id, form);
+        log.debug("retrieved form: id={} -> form={}", id, form);
 
         return new ModelAndView(getEditViewId(), "form", form);
     }
@@ -120,7 +120,7 @@ public abstract class AbstractCrudController<T> extends AbstractController {
 
         update(id, form);
 
-        log.info("updated form: id={} -> form=", id, form);
+        log.info("updated form: id={} -> form={}", id, form);
 
         setSuccessFeedback(updateSuccessMessage(),
                            redirectAttributes);

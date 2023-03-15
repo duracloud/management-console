@@ -114,6 +114,6 @@ public class DbUtilDriver {
         sb.append("\n\n\t\t");
         sb.append("read");
 
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 }

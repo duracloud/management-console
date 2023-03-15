@@ -96,8 +96,7 @@ public abstract class BaseAccessDecisionVoter implements AccessDecisionVoter<Met
     protected int voteUserHasRoleOnAccount(DuracloudUser user,
                                            String role,
                                            Long acctId) {
-        log.trace("Does user {} have role {} on acct {}?",
-                  new Object[] {user.getId(), role, acctId});
+        log.trace("Does user {} have role {} on acct {}?", user.getId(), role, acctId);
 
         AccountRights rights = getUserRightsForAcct(user.getId(), acctId);
         if (null == rights) {
@@ -121,15 +120,13 @@ public abstract class BaseAccessDecisionVoter implements AccessDecisionVoter<Met
                                                            Long acctId,
                                                            Long otherUserId,
                                                            Set<Role> otherRoles) {
-        log.trace("Voting if user {} has roles on acct {} to manage {}.",
-                  new Object[] {userId, acctId, otherUserId});
+        log.trace("Voting if user {} has roles on acct {} to manage {}.", userId, acctId, otherUserId);
 
         AccountRights rights = getUserRightsForAcct(userId, acctId);
         AccountRights other = getUserRightsForAcct(otherUserId, acctId);
 
         if (null == rights || null == other) {
-            log.warn("No rights found for users {}, {} on acct {}",
-                     new Object[] {userId, otherUserId, acctId});
+            log.warn("No rights found for users {}, {} on acct {}", userId, otherUserId, acctId);
             return ACCESS_DENIED;
         }
 
@@ -139,8 +136,7 @@ public abstract class BaseAccessDecisionVoter implements AccessDecisionVoter<Met
         boolean updates = hasVote(voteRolesAreSufficientToUpdateOther(rights.getRoles(),
                                                                       otherRoles));
 
-        log.trace("Are {} sufficient to update both {} and {}?",
-                  new Object[] {rights.getRoles(), other.getRoles(), otherRoles});
+        log.trace("Are {} sufficient to update both {} and {}?", rights.getRoles(), other.getRoles(), otherRoles);
 
         return existing && updates ? ACCESS_GRANTED : ACCESS_DENIED;
     }
@@ -249,8 +245,7 @@ public abstract class BaseAccessDecisionVoter implements AccessDecisionVoter<Met
     protected int castVote(int decision, MethodInvocation invocation) {
         String methodName = invocation.getMethod().getName();
         String className = invocation.getThis().getClass().getSimpleName();
-        log.trace("{}.{}() = {}", new Object[] {className, methodName, asString(
-            decision)});
+        log.trace("{}.{}() = {}", className, methodName, asString(decision));
         return decision;
     }
 

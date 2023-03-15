@@ -137,8 +137,8 @@ public class DuplicationMonitorTest {
 
         dupMonitor.countSpaces(host, dupInfo, store, spaces, true);
         Map<String, Long> spaceCounts = dupInfo.getSpaceCounts(storeId);
-        assertEquals(new Long(1), spaceCounts.get(space1));
-        assertEquals(new Long(2), spaceCounts.get(space2));
+        assertEquals(Long.valueOf(1), spaceCounts.get(space1));
+        assertEquals(Long.valueOf(2), spaceCounts.get(space2));
     }
 
     @Test

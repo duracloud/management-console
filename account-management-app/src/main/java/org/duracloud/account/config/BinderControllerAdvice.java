@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 
 /**
+ * todo: likely deprecated w/ spring update to 5.3.25
  * Recommended solution for https://spring.io/blog/2022/03/31/spring-framework-rce-early-announcement
  * @author dbernstein
  */

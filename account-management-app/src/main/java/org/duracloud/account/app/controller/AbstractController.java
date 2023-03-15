@@ -137,16 +137,6 @@ public abstract class AbstractController {
         return new ModelAndView("exception", "ex", e);
     }
 
-    /*
-    @ExceptionHandler(Exception.class)
-    public ModelAndView handleException(Exception e) {
-        setError(e);
-        String username =
-            SecurityContextHolder.getContext().getAuthentication().getName();
-        return createRedirectMav(UserController.formatUserUrl(username));
-    }
-    */
-
     protected static String formatUserUrl(String username) {
         String url = USERS_MAPPING + USER_MAPPING;
         url = url.replaceAll("\\{username.*\\}", username);

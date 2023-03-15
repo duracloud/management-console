@@ -178,10 +178,8 @@ public class AccountServiceImpl implements AccountService {
     public void storeAccountInfo(String acctName,
                                  String orgName,
                                  String department) {
-        String[] logInfo =
-            {account.getSubdomain(), acctName, orgName, department};
         log.info("Updating info for account {}. Account Name: {}, " +
-                 "Org Name: {}, Department: {}", logInfo);
+                 "Org Name: {}, Department: {}", account.getSubdomain(), acctName, orgName, department);
 
         account.setAcctName(acctName);
         account.setOrgName(orgName);
