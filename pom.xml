@@ -212,8 +212,8 @@
     <log.level.default>INFO</log.level.default>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <duracloud.artifact.version>7.1.1</duracloud.artifact.version>
-    <duracloud.db.version>7.1.0</duracloud.db.version>
+    <duracloud.artifact.version>7.2.0-SNAPSHOT</duracloud.artifact.version>
+    <duracloud.db.version>7.2.0-SNAPSHOT</duracloud.db.version>
     <duraspace-codestyle.version>1.1.0</duraspace-codestyle.version>
     <aws.version>1.12.122</aws.version>
     <org.springframework.version>4.3.30.RELEASE</org.springframework.version>
