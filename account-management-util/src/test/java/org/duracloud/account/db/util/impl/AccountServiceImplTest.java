@@ -12,6 +12,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.duracloud.account.config.AmaEndpoint;
@@ -104,8 +105,8 @@ public class AccountServiceImplTest extends EasyMockSupport {
         expect(repoMgr.getStorageProviderAccountRepo())
             .andReturn(providerAccountRepo)
             .times(2);
-        expect(providerAccountRepo.findOne(storageProviderId))
-            .andReturn(providerAccount);
+        expect(providerAccountRepo.findById(storageProviderId))
+            .andReturn(Optional.of(providerAccount));
 
         Set<StorageProviderAccount> providerAccounts = new HashSet<>();
         providerAccounts.add(providerAccount);
@@ -117,7 +118,7 @@ public class AccountServiceImplTest extends EasyMockSupport {
         expect(accountRepo.save(acct))
             .andReturn(null); // output is not used
 
-        providerAccountRepo.delete(storageProviderId);
+        providerAccountRepo.deleteById(storageProviderId);
         expectLastCall();
 
         accountChangeNotifier.storageProvidersChanged(subdomain);

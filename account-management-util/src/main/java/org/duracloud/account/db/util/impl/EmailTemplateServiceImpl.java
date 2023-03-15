@@ -39,7 +39,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         if (list().size() == EmailTemplate.Templates.values().length) {
             log.info("Templates initialized.");
         } else {
-            Arrays.asList(EmailTemplate.Templates.values()).stream().forEach(t -> {
+            Arrays.asList(EmailTemplate.Templates.values()).forEach(t -> {
                 EmailTemplate emailTemplate = this.repo.findByTemplate(t);
                 if (emailTemplate == null) {
                     this.repo.save(EmailTemplateUtil.loadDefault(t));
@@ -55,7 +55,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public EmailTemplate getTemplate(Long templateId) {
-        return this.repo.findOne(templateId);
+        return this.repo.findById(templateId).orElse(null);
     }
 
     @Override

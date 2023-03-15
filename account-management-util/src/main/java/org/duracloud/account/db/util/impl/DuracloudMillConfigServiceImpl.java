@@ -67,10 +67,8 @@ public class DuracloudMillConfigServiceImpl implements DuracloudMillConfigServic
 
         RabbitmqConfig rabbitmqConfig = null;
         if (null != rabbitmqConfigId) {
-            rabbitmqConfig = rmqRepo.findOne(rabbitmqConfigId);
-            if (null == rabbitmqConfig) {
-                rabbitmqConfig = new RabbitmqConfig();
-            }
+            final var rmqConfig = rmqRepo.findById(rabbitmqConfigId);
+            rabbitmqConfig = rmqConfig.orElseGet(RabbitmqConfig::new);
         }
 
         dm.setDbHost(dbHost);

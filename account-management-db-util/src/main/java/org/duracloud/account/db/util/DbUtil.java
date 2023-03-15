@@ -98,20 +98,19 @@ public class DbUtil {
                 // Entities with relationship need to have their related
                 // entities looked up and then set to save properly.
                 if (entity instanceof AccountInfo) {
-                    AccountInfo sd = (AccountInfo) entity;
-                    sd.setPrimaryStorageProviderAccount(
-                        repoMgr.getStorageProviderAccountRepo()
-                               .findOne(sd.getPrimaryStorageProviderAccount().getId()));
+                    final AccountInfo sd = (AccountInfo) entity;
+                    final var accountId = sd.getId();
+                    final var spa = repoMgr.getStorageProviderAccountRepo().findById(accountId);
+                    spa.ifPresent(sd::setPrimaryStorageProviderAccount);
 
-                    Set<StorageProviderAccount> storageProviderAccounts =
-                        sd.getSecondaryStorageProviderAccounts();
+                    Set<StorageProviderAccount> storageProviderAccounts = sd.getSecondaryStorageProviderAccounts();
                     try {
                         if (storageProviderAccounts.size() > 0) {
                             Set<StorageProviderAccount> accounts = new HashSet<>();
                             for (StorageProviderAccount sp : storageProviderAccounts) {
-                                StorageProviderAccount account = repoMgr.getStorageProviderAccountRepo()
-                                                                        .findOne(sp.getId());
-                                accounts.add(account);
+                                final var account = repoMgr.getStorageProviderAccountRepo()
+                                                                        .findById(sp.getId());
+                                account.ifPresent(accounts::add);
                             }
                             sd.setSecondaryStorageProviderAccounts(accounts);
                             log.warn("Set a secondary storage provider to ServerDetails with id "
@@ -126,26 +125,35 @@ public class DbUtil {
                     }
                     repo.saveAndFlush(sd);
                 } else if (entity instanceof DuracloudGroup) {
-                    DuracloudGroup dg = (DuracloudGroup) entity;
-                    dg.setAccount(repoMgr.getAccountRepo().findOne(dg.getAccount().getId()));
+                    final DuracloudGroup dg = (DuracloudGroup) entity;
+                    final var groupId = dg.getId();
+                    repoMgr.getAccountRepo().findById(groupId)
+                           .ifPresent(dg::setAccount);
                     if (dg.getUsers().size() > 0) {
                         Set<DuracloudUser> users = new HashSet<>();
                         for (DuracloudUser user : dg.getUsers()) {
-                            users.add(repoMgr.getUserRepo().findOne(user.getId()));
+                            repoMgr.getUserRepo().findById(user.getId())
+                                   .ifPresent(users::add);
                         }
                         dg.setUsers(users);
                     }
                     repo.saveAndFlush(dg);
                 } else if (entity instanceof AccountRights) {
-                    AccountRights rights = (AccountRights) entity;
-                    rights.setAccount(repoMgr.getAccountRepo().findOne(rights.getAccount().getId()));
+                    final AccountRights rights = (AccountRights) entity;
+                    final var rightsId = rights.getId();
+                    repoMgr.getAccountRepo().findById(rightsId)
+                           .ifPresent(rights::setAccount);
 
-                    rights.setUser(repoMgr.getUserRepo().findOne(
-                        rights.getUser().getId()));
+                    final var userId = rights.getUser().getId();
+                    repoMgr.getUserRepo().findById(userId)
+                           .ifPresent(rights::setUser);
+
                     repo.saveAndFlush(rights);
                 } else if (entity instanceof UserInvitation) {
-                    UserInvitation ui = (UserInvitation) entity;
-                    ui.setAccount(repoMgr.getAccountRepo().findOne(ui.getAccount().getId()));
+                    final UserInvitation ui = (UserInvitation) entity;
+                    final var inviteId = ui.getId();
+                    repoMgr.getAccountRepo().findById(inviteId)
+                           .ifPresent(ui::setAccount);
                     repo.saveAndFlush(ui);
                 } else {
                     repo.saveAndFlush(entity);

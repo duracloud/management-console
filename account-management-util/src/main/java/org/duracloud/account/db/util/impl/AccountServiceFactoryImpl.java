@@ -37,16 +37,16 @@ import org.springframework.stereotype.Component;
 @Component("accountServiceFactory")
 public class AccountServiceFactoryImpl implements AccountServiceFactory {
 
-    private Logger log = LoggerFactory.getLogger(AccountServiceFactoryImpl.class);
+    private final Logger log = LoggerFactory.getLogger(AccountServiceFactoryImpl.class);
 
-    private DuracloudRepoMgr repoMgr;
-    private AccessDecisionVoter voter;
-    private SecurityContextUtil securityContext;
-    private AnnotationParser annotationParser;
-    private AmaEndpoint amaEndpoint;
-    private AccountChangeNotifier accountChangeNotifier;
-    private NotificationMgr notificationMgr;
-    private EmailTemplateService emailTemplateService;
+    private final DuracloudRepoMgr repoMgr;
+    private final AccessDecisionVoter voter;
+    private final SecurityContextUtil securityContext;
+    private final AnnotationParser annotationParser;
+    private final AmaEndpoint amaEndpoint;
+    private final AccountChangeNotifier accountChangeNotifier;
+    private final NotificationMgr notificationMgr;
+    private final EmailTemplateService emailTemplateService;
 
     @Autowired
     public AccountServiceFactoryImpl(DuracloudRepoMgr repoMgr,
@@ -68,9 +68,9 @@ public class AccountServiceFactoryImpl implements AccountServiceFactory {
     }
 
     @Override
-    public AccountService getAccount(Long acctId)
-        throws AccountNotFoundException {
-        AccountInfo acctInfo = repoMgr.getAccountRepo().findOne(acctId);
+    public AccountService getAccount(Long acctId) throws AccountNotFoundException {
+        final var acctInfo = repoMgr.getAccountRepo().findById(acctId)
+            .orElseThrow(() -> new AccountNotFoundException(acctId));
         return getAccount(acctInfo);
     }
 

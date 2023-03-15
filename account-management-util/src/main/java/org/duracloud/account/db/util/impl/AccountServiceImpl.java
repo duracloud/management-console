@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
     public Set<DuracloudUser> getUsers() {
         DuracloudRightsRepo rightsRepo = repoMgr.getRightsRepo();
 
-        Set<DuracloudUser> users = new HashSet<DuracloudUser>();
+        Set<DuracloudUser> users = new HashSet<>();
         List<AccountRights> rights =
             rightsRepo.findByAccountId(account.getId());
 
@@ -116,13 +116,17 @@ public class AccountServiceImpl implements AccountService {
         String accountId = account.getSubdomain();
         log.info("Removing storage provider with ID {} from account {}", storageProviderId, accountId);
 
-        StorageProviderAccount storageProviderAccount =
-            repoMgr.getStorageProviderAccountRepo().findOne(storageProviderId);
+        StorageProviderAccount storageProviderAccount = repoMgr.getStorageProviderAccountRepo()
+            .findById(storageProviderId)
+            .orElseThrow(() -> new DuracloudProviderAccountNotAvailableException(
+                "The storage provider account with ID: " + storageProviderId + " not found."
+            ));
         AccountInfo accountInfo = retrieveAccountInfo();
+
         if (accountInfo.getSecondaryStorageProviderAccounts()
                        .remove(storageProviderAccount)) {
             saveAccountInfo(accountInfo);
-            repoMgr.getStorageProviderAccountRepo().delete(storageProviderId);
+            repoMgr.getStorageProviderAccountRepo().deleteById(storageProviderId);
 
             // Propagate changes to DuraCloud
             accountChangeNotifier.storageProvidersChanged(accountId);
@@ -233,11 +237,11 @@ public class AccountServiceImpl implements AccountService {
             repoMgr.getUserInvitationRepo().findByAccountId(account.getId());
 
         Date now = new Date();
-        Set<UserInvitation> pendingInvitations = new HashSet<UserInvitation>();
+        Set<UserInvitation> pendingInvitations = new HashSet<>();
 
         for (UserInvitation ui : invitations) {
             if (ui.getExpirationDate().before(now)) {
-                repoMgr.getUserInvitationRepo().delete(ui.getId());
+                repoMgr.getUserInvitationRepo().deleteById(ui.getId());
             } else {
                 pendingInvitations.add(ui);
             }
@@ -251,7 +255,7 @@ public class AccountServiceImpl implements AccountService {
         log.info("Deleting user invitation with id {} from account {}",
                  invitationId, account.getSubdomain());
 
-        repoMgr.getUserInvitationRepo().delete(invitationId);
+        repoMgr.getUserInvitationRepo().deleteById(invitationId);
     }
 
 }

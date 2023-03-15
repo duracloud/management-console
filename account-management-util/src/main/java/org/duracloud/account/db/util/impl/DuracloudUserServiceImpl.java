@@ -7,9 +7,11 @@
  */
 package org.duracloud.account.db.util.impl;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.duracloud.account.config.AmaEndpoint;
@@ -157,11 +159,7 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
     }
 
     private boolean setUserRightsInternal(Long acctId, Long userId, Role... roles) {
-
-        Set<Role> roleSet = new HashSet<Role>();
-        for (Role role : roles) {
-            roleSet.add(role);
-        }
+        Set<Role> roleSet = new HashSet<>(Arrays.asList(roles));
 
         log.info("Updating user rights for user {} on account {} to roles " +
                  asString(roleSet), userId, acctId);
@@ -185,7 +183,7 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         }
 
         Set<Role> oldRoles = null;
-        Set<Role> newRoles = new HashSet<Role>();
+        Set<Role> newRoles = new HashSet<>();
         for (Role role : roles) {
             newRoles.addAll(role.getRoleHierarchy());
         }
@@ -225,12 +223,13 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
                             Set<Role> roles,
                             AccountRights rights) {
         if (null == rights) {
-            AccountInfo account = repoMgr.getAccountRepo().findOne(acctId);
-            DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
+            // todo: is there a bette way to handle this?
+            Optional<AccountInfo> account = repoMgr.getAccountRepo().findById(acctId);
+            Optional<DuracloudUser> user = repoMgr.getUserRepo().findById(userId);
 
             rights = new AccountRights();
-            rights.setAccount(account);
-            rights.setUser(user);
+            rights.setAccount(account.orElse(null));
+            rights.setUser(user.orElse(null));
             rights.setRoles(roles);
         } else {
             rights.setRoles(roles);
@@ -254,24 +253,26 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
             rightsRepo.findByAccountIdAndUserId(acctId, userId);
         if (rights != null) {
             DuracloudUserRepo userRepo = repoMgr.getUserRepo();
-            DuracloudUser user = userRepo.findOne(userId);
-            user.getAccountRights().remove(rights);
-            userRepo.saveAndFlush(user);
-            rightsRepo.delete(rights.getId());
+            userRepo.findById(userId).ifPresent(user -> {
+                user.getAccountRights().remove(rights);
+                userRepo.saveAndFlush(user);
+            });
+            rightsRepo.deleteById(rights.getId());
         }
     }
 
     private void removeUserFromAccountGroups(Long acctId, Long userId) {
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-        DuracloudGroupRepo groupRepo = repoMgr.getGroupRepo();
-        List<DuracloudGroup> acctGroups = groupRepo.findByAccountId(acctId);
-        for (DuracloudGroup group : acctGroups) {
-            Set<DuracloudUser> groupUsers = group.getUsers();
-            if (groupUsers.contains(user)) {
-                groupUsers.remove(user);
-                groupRepo.save(group);
+        repoMgr.getUserRepo().findById(userId).ifPresent(user -> {
+            DuracloudGroupRepo groupRepo = repoMgr.getGroupRepo();
+            List<DuracloudGroup> acctGroups = groupRepo.findByAccountId(acctId);
+            for (DuracloudGroup group : acctGroups) {
+                Set<DuracloudUser> groupUsers = group.getUsers();
+                if (groupUsers.contains(user)) {
+                    groupUsers.remove(user);
+                    groupRepo.save(group);
+                }
             }
-        }
+        });
     }
 
     @Override
@@ -285,10 +286,9 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
 
             ChecksumUtil util = new ChecksumUtil(ChecksumUtil.Algorithm.SHA_256);
 
-            DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-            if (user == null) {
-                throw new DBNotFoundException("User with ID: " + userId + " does not exist.");
-            }
+            DuracloudUser user = repoMgr.getUserRepo().findById(userId)
+                .orElseThrow(() -> new DBNotFoundException("User with ID: " + userId + " does not exist."));
+
             if (!oldPasswordEncoded) {
                 oldPassword = util.generateChecksum(oldPassword);
             }
@@ -299,7 +299,7 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
             user.setPassword(util.generateChecksum(newPassword));
             repoMgr.getUserRepo().save(user);
 
-            propagateUserUpdate(userId);
+            propagateUserUpdate(user);
         }
     }
 
@@ -327,16 +327,14 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         }
 
         // Delete the invitation
-        invRepo.delete(invitation.getId());
+        invRepo.deleteById(invitation.getId());
     }
 
-    private void propagateUserUpdate(Long userId) {
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
+    private void propagateUserUpdate(DuracloudUser user) {
         // Propagate changes for each of the user's accounts
         if (!user.isRoot()) { // Do no propagate if user is root
 
-            List<AccountRights> rightsList =
-                repoMgr.getRightsRepo().findByUserId(userId);
+            List<AccountRights> rightsList = repoMgr.getRightsRepo().findByUserId(user.getId());
 
             for (AccountRights rights : rightsList) {
                 this.accountChangeNotifier.userStoreChanged(rights.getAccount().getSubdomain());
@@ -393,7 +391,7 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         }
         if (invite.getExpirationDate().getTime() < System.currentTimeMillis()) {
             log.info("invitation {} has expired. Deleting from repo...", invite);
-            this.repoMgr.getUserInvitationRepo().delete(invite.getId());
+            this.repoMgr.getUserInvitationRepo().deleteById(invite.getId());
             throw new DBNotFoundException("Invitation has expired: " + invite);
         } else {
             return invite;
@@ -427,13 +425,9 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
     }
 
     @Override
-    public DuracloudUser loadDuracloudUserByIdInternal(Long userId)
-        throws DBNotFoundException {
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-        if (user == null) {
-            throw new DBNotFoundException("User with ID: " + userId + " does not exist");
-        }
-        return user;
+    public DuracloudUser loadDuracloudUserByIdInternal(Long userId) throws DBNotFoundException {
+        return repoMgr.getUserRepo().findById(userId)
+                      .orElseThrow(() -> new DBNotFoundException("User with ID: " + userId + " does not exist"));
     }
 
     @Override
@@ -455,11 +449,15 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         }
 
         // Delete the invitation
-        invRepo.delete(invitation.getId());
+        invRepo.deleteById(invitation.getId());
 
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-        DuracloudUser adminUser =
-            repoMgr.getUserRepo().findByUsername(invitation.getAdminUsername());
+        DuracloudUser user = repoMgr.getUserRepo().findById(userId).orElseThrow(() -> {
+            final var msg = "Exception encountered attempting to redeem account invitation";
+            final var e = new DBNotFoundException("User with ID: " + userId + "does not exist");
+            return new UnsentEmailException(msg, e);
+        });
+
+        DuracloudUser adminUser = repoMgr.getUserRepo().findByUsername(invitation.getAdminUsername());
         if (adminUser == null) {
             String msg = "Exception encountered attempting to send admin user " +
                          invitation.getAdminUsername() + " notice that user with id " +
@@ -492,10 +490,9 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         throws DBNotFoundException {
         log.info("Updating user details for user with ID {}", userId);
 
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-        if (user == null) {
-            throw new DBNotFoundException("User with ID: " + userId + " does not exist");
-        }
+        DuracloudUser user = repoMgr.getUserRepo().findById(userId)
+            .orElseThrow(() -> new DBNotFoundException("User with ID: " + userId + " does not exist"));
+
         boolean emailUpdate = !user.getEmail().equals(email);
         boolean ipAddressUpdate = !Objects.equals(user.getAllowableIPAddressRange(),
                                                   allowableIPAddressRange);
@@ -509,7 +506,7 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         repoMgr.getUserRepo().save(user);
 
         if (emailUpdate || ipAddressUpdate) {
-            propagateUserUpdate(userId);
+            propagateUserUpdate(user);
         }
     }
 
@@ -525,11 +522,9 @@ public class DuracloudUserServiceImpl implements DuracloudUserService, UserDetai
         boolean added = setUserRightsInternal(acctId, userId, Role.ROLE_USER);
         if (added) {
             DuracloudUser user = loadDuracloudUserByIdInternal(userId);
-            AccountInfo accountInfo =
-                repoMgr.getAccountRepo().findOne(acctId);
-            if (accountInfo == null) {
-                throw new DBNotFoundException("Account with ID: " + acctId + " does not exist");
-            }
+            AccountInfo accountInfo = repoMgr.getAccountRepo().findById(acctId)
+                       .orElseThrow(() -> new DBNotFoundException("Account with ID: " + acctId + " does not exist"));
+
             getNotifier().sendNotificationUserAddedToAccount(user, accountInfo);
         }
 
