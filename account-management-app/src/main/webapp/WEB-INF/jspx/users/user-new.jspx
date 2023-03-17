@@ -22,25 +22,24 @@
             <script src="https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}"><!-- comment --></script>
             <script>
                 $(function() {
-                (function() {
-                var test = "test";
-                $("input").bind("keypress", function (e) {
-                if (e.keyCode == 13) {
-                return false;
-                }
-                });
+                    (function() {
+                        var test = "test";
+                        $("input").bind("keypress", function (e) {
+                            if (e.keyCode == 13) {
+                                return false;
+                            }
+                        });
 
-                $("#create-user-button").click(function(e) {
-                e.preventDefault();
-                grecaptcha.ready(function() {
-                grecaptcha.execute('${recaptchaSiteKey}', {action: 'submit'})
-                .then(function(token) {
-                $("#recaptcha-response").val(token)
-                document.forms["new-user-form"].submit();
-                });
-                });
-                });
-                })();
+                        $("#create-user-button").click(function(e) {
+                            e.preventDefault();
+                            grecaptcha.ready(function() {
+                                grecaptcha.execute('${recaptchaSiteKey}', {action: 'submit'}).then(function(token) {
+                                    $("#recaptcha-response").val(token)
+                                    document.forms["new-user-form"].submit();
+                                });
+                            });
+                        });
+                    })();
                 });
             </script>
         </c:when>
