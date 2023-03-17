@@ -196,10 +196,7 @@ public abstract class AbstractController {
             if (statusCode == HttpStatus.SC_OK) {
                 var map = new ObjectMapper().readValue(jsonStr, Map.class);
                 success = (boolean) map.get("success");
-                var challengeTimestamp = map.get("challenge_ts");
-                var hostname = (String) map.get("hostname");
-                var action = (String) map.get("action");
-                var score = (double) map.get("score");
+
             }
         }
         return success;
