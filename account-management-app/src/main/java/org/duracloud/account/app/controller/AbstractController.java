@@ -90,7 +90,7 @@ public abstract class AbstractController {
     }
 
     @ModelAttribute("recaptchaSiteKey")
-    public String getRecaptchSiteKey() {
+    public String getRecaptchaSiteKey() {
         return recaptchaSiteKey;
     }
 
@@ -99,7 +99,7 @@ public abstract class AbstractController {
         return recaptchaEnabled;
     }
 
-    public String getRecaptchSecret() {
+    public String getRecaptchaSecret() {
         return recaptchaSecret;
     }
 
@@ -182,7 +182,7 @@ public abstract class AbstractController {
         final HttpPost httpPost = new HttpPost("https://www.google.com/recaptcha/api/siteverify");
         final List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("response", recaptchaResponse));
-        params.add(new BasicNameValuePair("secret", getRecaptchSecret()));
+        params.add(new BasicNameValuePair("secret", getRecaptchaSecret()));
         httpPost.setEntity(new UrlEncodedFormEntity(params));
 
         try (CloseableHttpClient client = HttpClients.createDefault();
