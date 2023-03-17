@@ -453,6 +453,14 @@ public class UserController extends AbstractController {
             return new ModelAndView(NEW_USER_VIEW, model.asMap());
         }
 
+        if (isRecaptchaEnabled()) {
+            var recaptchaResponse = newUserForm.getRecaptchaResponse();
+            final boolean recaptchaIsValid = validateRecaptcha(recaptchaResponse);
+            if (!recaptchaIsValid) {
+                return new ModelAndView(NEW_USER_VIEW, model.asMap());
+            }
+        }
+
         DuracloudUser user = this.userService.createNewUser(newUserForm.getUsername(),
                                                             newUserForm.getPassword(),
                                                             newUserForm.getFirstName(),

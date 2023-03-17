@@ -7,14 +7,30 @@
  */
 package org.duracloud.account.app.controller;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.model.Role;
 import org.duracloud.account.db.util.DuracloudUserService;
 import org.duracloud.account.util.UserFeedbackUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,6 +46,16 @@ import org.springframework.web.servlet.view.RedirectView;
 public abstract class AbstractController {
 
     protected Logger log = LoggerFactory.getLogger(AbstractController.class);
+
+    @Value("${recaptcha.enabled:false}")
+    private boolean recaptchaEnabled;
+
+    @Value("${recaptcha.siteKey:placeholderSiteKey}")
+    private String recaptchaSiteKey;
+
+    @Value("${recaptcha.secret:placeholderSecret}")
+    private String recaptchaSecret;
+
     public static final String USERS_MAPPING = "/users";
     public static final String USER_MAPPING = "/byid/{username:[a-z0-9.\\-_@]*}";
 
@@ -61,6 +87,20 @@ public abstract class AbstractController {
     @ModelAttribute("userRole")
     public Role getUserRole() {
         return Role.ROLE_USER;
+    }
+
+    @ModelAttribute("recaptchaSiteKey")
+    public String getRecaptchaSiteKey() {
+        return recaptchaSiteKey;
+    }
+
+    @ModelAttribute("recaptchaEnabled")
+    protected boolean isRecaptchaEnabled() {
+        return recaptchaEnabled;
+    }
+
+    public String getRecaptchaSecret() {
+        return recaptchaSecret;
     }
 
     protected void setUserRights(DuracloudUserService userService,
@@ -136,4 +176,29 @@ public abstract class AbstractController {
         UserFeedbackUtil.addFailureFlash(message, redirectAttributes);
     }
 
+    protected boolean validateRecaptcha(final String recaptchaResponse) throws IOException {
+        log.info("recaptcha response from form = {}", recaptchaResponse);
+        boolean success = false;
+        final HttpPost httpPost = new HttpPost("https://www.google.com/recaptcha/api/siteverify");
+        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("response", recaptchaResponse));
+        params.add(new BasicNameValuePair("secret", getRecaptchaSecret()));
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse response = (CloseableHttpResponse) client
+                     .execute(httpPost)) {
+            var statusLine = response.getStatusLine();
+            log.info("http status from recaptcha = {}", statusLine.toString());
+            var jsonStr = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
+            log.info("http response body from recaptcha = {}", jsonStr);
+            final int statusCode = statusLine.getStatusCode();
+            if (statusCode == HttpStatus.SC_OK) {
+                var map = new ObjectMapper().readValue(jsonStr, Map.class);
+                success = (boolean) map.get("success");
+
+            }
+        }
+        return success;
+    }
 }
