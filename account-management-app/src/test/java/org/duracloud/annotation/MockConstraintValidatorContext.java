@@ -24,6 +24,11 @@ public class MockConstraintValidatorContext implements ConstraintValidatorContex
         return null;
     }
 
+    @Override
+    public <T> T unwrap(Class<T> aClass) {
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see javax.validation.ConstraintValidatorContext#disableDefaultConstraintViolation()
      */

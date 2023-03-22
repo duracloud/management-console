@@ -15,7 +15,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.duracloud.account.util.EmailAddressesParser;
-import org.hibernate.validator.constraints.impl.EmailValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 
 /**
  * @author "Daniel Bernstein (dbernstein@duraspace.org)"
@@ -24,7 +24,7 @@ import org.hibernate.validator.constraints.impl.EmailValidator;
 public class EmailAddressesValidator
     implements ConstraintValidator<EmailAddressesConstraint, String> {
     private EmailAddressesConstraint constraintAnnotation;
-    private static EmailValidator EMAIL_VALIDATOR = new EmailValidator();
+    private static final EmailValidator EMAIL_VALIDATOR = new EmailValidator();
 
     /*
      * (non-Javadoc)
@@ -39,7 +39,7 @@ public class EmailAddressesValidator
         for (String ea : emailAddresses) {
             if (!EMAIL_VALIDATOR.isValid(ea, null)) {
                 if (badAddresses == null) {
-                    badAddresses = new LinkedList<String>();
+                    badAddresses = new LinkedList<>();
                 }
 
                 badAddresses.add(ea);
