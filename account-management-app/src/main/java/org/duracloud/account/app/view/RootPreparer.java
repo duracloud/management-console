@@ -10,8 +10,8 @@ package org.duracloud.account.app.view;
 import java.util.LinkedList;
 
 import org.apache.tiles.AttributeContext;
-import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.preparer.ViewPreparer;
+import org.apache.tiles.request.Request;
 import org.duracloud.account.app.controller.DuracloudMillController;
 import org.duracloud.account.app.controller.GlobalPropertiesController;
 import org.duracloud.account.app.controller.NotificationsController;
@@ -20,13 +20,11 @@ import org.springframework.stereotype.Component;
 @Component("rootPreparer")
 public class RootPreparer implements ViewPreparer {
     @Override
-    public void execute(TilesRequestContext tilesContext,
-                        AttributeContext attributeContext) {
-        tilesContext.getRequestScope().put("primaryTabs", new RootTabs());
-        String currentUri =
-            (String) tilesContext.getRequestScope()
-                                 .get("javax.servlet.forward.request_uri");
-        tilesContext.getRequestScope().put("currentUri", currentUri);
+    public void execute(final Request request, final AttributeContext attributeContext) {
+        final var requestScope = request.getContext("request");
+        requestScope.put("primaryTabs", new RootTabs());
+        String currentUri = (String) requestScope.get("javax.servlet.forward.request_uri");
+        requestScope.put("currentUri", currentUri);
     }
 
     public static class RootTabs extends LinkedList<Tab> {

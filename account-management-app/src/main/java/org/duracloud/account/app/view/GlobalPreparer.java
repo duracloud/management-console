@@ -8,8 +8,8 @@
 package org.duracloud.account.app.view;
 
 import org.apache.tiles.AttributeContext;
-import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.preparer.ViewPreparer;
+import org.apache.tiles.request.Request;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class GlobalPreparer implements ViewPreparer {
 
     @Override
-    public void execute(TilesRequestContext tilesContext,
+    public void execute(Request tilesContext,
                         AttributeContext attributeContext) {
 
     }
