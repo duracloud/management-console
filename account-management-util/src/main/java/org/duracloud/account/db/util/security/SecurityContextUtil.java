@@ -25,14 +25,8 @@ public class SecurityContextUtil {
 
     private final Logger log = LoggerFactory.getLogger(SecurityContextUtil.class);
 
-    static {
-        //We set this value here in order to ensure that spawned threads do not
-        //lose their security context.
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-    }
-
     public Authentication getAuthentication() throws NoUserLoggedInException {
-        SecurityContext context = SecurityContextHolder.getContext();
+        SecurityContext context = SecurityContextHolder.getContextHolderStrategy().getContext();
         Authentication auth = context.getAuthentication();
         if (null == auth) {
             log.debug("no user-auth found.");

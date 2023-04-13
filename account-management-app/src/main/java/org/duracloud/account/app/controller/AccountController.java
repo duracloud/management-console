@@ -58,7 +58,7 @@ public class AccountController extends AbstractAccountController {
         accountService.storeAccountStatus(AccountInfo.AccountStatus.ACTIVE);
 
         String username =
-            SecurityContextHolder.getContext().getAuthentication().getName();
+            SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName();
         return createUserRedirectModelAndView(username);
     }
 
@@ -71,7 +71,7 @@ public class AccountController extends AbstractAccountController {
         accountService.storeAccountStatus(AccountInfo.AccountStatus.INACTIVE);
 
         String username =
-            SecurityContextHolder.getContext().getAuthentication().getName();
+            SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName();
         return createUserRedirectModelAndView(username);
     }
 

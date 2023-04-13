@@ -176,7 +176,7 @@ public abstract class AbstractAccountController extends AbstractController {
      * @return
      */
     protected DuracloudUser getUser() throws DBNotFoundException {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+        SecurityContext securityContext = SecurityContextHolder.getContextHolderStrategy().getContext();
         Authentication authentication = securityContext.getAuthentication();
         String username = authentication.getName();
         return this.userService.loadDuracloudUserByUsername(username);

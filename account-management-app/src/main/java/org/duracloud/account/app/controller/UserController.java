@@ -148,7 +148,7 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = {"/profile"}, method = RequestMethod.GET)
     public ModelAndView profileRedirect() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
         if (auth.isAuthenticated() && auth instanceof AnonymousAuthenticationToken) {
             //this check is necessary because on logout the browser is getting directed here
             //I'm not sure why the request is getting through - everything seems properly configured
