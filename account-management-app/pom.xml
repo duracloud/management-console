@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.duracloud</groupId>
     <artifactId>duracloud-mc</artifactId>
-    <version>7.2.0-SNAPSHOT</version>
+    <version>7.2.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -12,7 +12,7 @@
   <groupId>org.duracloud</groupId>
   <artifactId>ama</artifactId>
   <packaging>war</packaging>
-  <version>7.2.0-SNAPSHOT</version>
+  <version>7.2.0</version>
   <name>Account Management App</name>
   <url>http://duraspace.org</url>
 
