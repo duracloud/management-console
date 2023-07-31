@@ -215,7 +215,7 @@
     <duracloud.artifact.version>7.2.0-SNAPSHOT</duracloud.artifact.version>
     <duracloud.db.version>7.2.0-SNAPSHOT</duracloud.db.version>
     <duraspace-codestyle.version>1.1.0</duraspace-codestyle.version>
-    <aws.version>1.12.122</aws.version>
+    <aws.version>1.12.497</aws.version>
     <tiles.version>3.0.1</tiles.version>
     <hibernate.validator.version>5.4.3.Final</hibernate.validator.version>
     <org.springframework.version>5.3.27</org.springframework.version>
@@ -840,14 +840,10 @@
 
       <dependency>
         <groupId>com.amazonaws</groupId>
-        <artifactId>aws-java-sdk-sns</artifactId>
+        <artifactId>aws-java-sdk-bom</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
         <version>${aws.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Needed to indicate specific version to override amazon-aws jar -->
