@@ -8,13 +8,11 @@
 package org.duracloud.account.jsp;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 /**
  * Uses JSoup.clean to sanitize html markup.
@@ -29,12 +27,10 @@ public class SanitizeTag extends SimpleTagSupport {
         this.text = text;
     }
 
-    StringWriter sw = new StringWriter();
-
-    public void doTag() throws JspException, IOException {
+    public void doTag() throws IOException {
         if (text != null) {
             JspWriter out = getJspContext().getOut();
-            out.println(Jsoup.clean(text, Whitelist.basic()));
+            out.println(Jsoup.clean(text, Safelist.basic()));
         }
 
     }
