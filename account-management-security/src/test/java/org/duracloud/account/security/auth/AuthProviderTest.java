@@ -15,7 +15,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 /**
@@ -34,8 +34,7 @@ public class AuthProviderTest {
     }
 
     private boolean testIpAuthChecks(String remoteAddress) {
-        AuthProvider authProvider =
-            new AuthProvider(null, new ShaPasswordEncoder(256));
+        AuthProvider authProvider = new AuthProvider(null, new MessageDigestPasswordEncoder("SHA-256"));
 
         String username = "user";
         String password = "pass";
@@ -86,8 +85,7 @@ public class AuthProviderTest {
 
     @Test
     public void testIpInRange() {
-        AuthProvider authProvider =
-            new AuthProvider(null, new ShaPasswordEncoder(256));
+        AuthProvider authProvider = new AuthProvider(null, new MessageDigestPasswordEncoder("SHA-256"));
 
         assertTrue(authProvider.ipInRange("1.2.3.4", "1.1.1.1/0"));
         assertTrue(authProvider.ipInRange("1.2.3.4", "1.2.3.4/32"));

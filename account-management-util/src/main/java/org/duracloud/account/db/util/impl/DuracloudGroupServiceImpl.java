@@ -17,6 +17,7 @@ import org.duracloud.account.db.model.DuracloudGroup;
 import org.duracloud.account.db.model.DuracloudUser;
 import org.duracloud.account.db.repo.DuracloudRepoMgr;
 import org.duracloud.account.db.util.DuracloudGroupService;
+import org.duracloud.account.db.util.error.AccountNotFoundException;
 import org.duracloud.account.db.util.error.DuracloudGroupAlreadyExistsException;
 import org.duracloud.account.db.util.error.DuracloudGroupNotFoundException;
 import org.duracloud.account.db.util.error.InvalidGroupNameException;
@@ -70,7 +71,8 @@ public class DuracloudGroupServiceImpl implements DuracloudGroupService {
             throw new DuracloudGroupAlreadyExistsException(name);
         }
 
-        AccountInfo accountInfo = repoMgr.getAccountRepo().findOne(acctId);
+        // The account id exists per the previous calls
+        AccountInfo accountInfo = repoMgr.getAccountRepo().findById(acctId).get();
 
         DuracloudGroup group = new DuracloudGroup();
         group.setName(name);
@@ -110,7 +112,7 @@ public class DuracloudGroupServiceImpl implements DuracloudGroupService {
             log.warn("Arg group is null.");
             return;
         }
-        repoMgr.getGroupRepo().delete(group.getId());
+        repoMgr.getGroupRepo().deleteById(group.getId());
         propagateUpdate(acctId);
     }
 
@@ -126,7 +128,8 @@ public class DuracloudGroupServiceImpl implements DuracloudGroupService {
 
     private void propagateUpdate(Long acctId) {
         try {
-            AccountInfo account = this.repoMgr.getAccountRepo().getOne(acctId);
+            final var account = this.repoMgr.getAccountRepo().findById(acctId)
+                .orElseThrow(() -> new AccountNotFoundException(acctId));
             this.accountChangeNotifier.userStoreChanged(account.getSubdomain());
         } catch (Exception ex) {
             log.error("failed to notify of change to account " + acctId, ex);

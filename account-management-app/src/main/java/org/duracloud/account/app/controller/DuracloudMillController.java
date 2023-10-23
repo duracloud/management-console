@@ -89,7 +89,7 @@ public class DuracloudMillController {
             }
 
             // Hidden value to ensure we can't use global props rmq conf
-            // if there is no gloabl props rmq conf available
+            // if there is no global props rmq conf available
             form.setGlobalPropsRmqConfAvailable(rabbitmqConfigService.get(1L) != null);
 
             return form;

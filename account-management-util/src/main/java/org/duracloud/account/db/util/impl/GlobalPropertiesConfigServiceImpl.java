@@ -64,10 +64,7 @@ public class GlobalPropertiesConfigServiceImpl implements GlobalPropertiesConfig
 
         RabbitmqConfig rabbitmqConfig = null;
         if (null != rabbitmqConfigId) {
-            rabbitmqConfig = rmqRepo.findOne(rabbitmqConfigId);
-            if (null == rabbitmqConfig) {
-                rabbitmqConfig = new RabbitmqConfig();
-            }
+            rabbitmqConfig = rmqRepo.findById(rabbitmqConfigId).orElseGet(RabbitmqConfig::new);
             instanceNotificationTopicArn = null;
         } else {
             rabbitmqExchange = null;

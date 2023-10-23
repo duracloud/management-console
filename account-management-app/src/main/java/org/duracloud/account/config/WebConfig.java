@@ -8,13 +8,16 @@
 package org.duracloud.account.config;
 
 import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.binding.convert.ConversionService;
 import org.springframework.binding.convert.service.DefaultConversionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.format.support.FormattingConversionService;
+import org.springframework.lang.NonNull;
+import org.springframework.validation.Validator;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.bind.support.ConfigurableWebBindingInitializer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -29,17 +32,20 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     @Bean
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
+    @NonNull
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter(
+        @NonNull final ContentNegotiationManager contentNegotiationManager,
+        @NonNull final FormattingConversionService conversionService,
+        @NonNull final Validator validator) {
+        RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter(contentNegotiationManager,
+                                                                                  conversionService,
+                                                                                  validator);
         ConfigurableWebBindingInitializer initializer =
             (ConfigurableWebBindingInitializer) adapter.getWebBindingInitializer();
 
-        PropertyEditorRegistrar propertyEditorRegistrar = new PropertyEditorRegistrar() {
-            @Override
-            public void registerCustomEditors(PropertyEditorRegistry registry) {
-                //Trim strings before setting values on all form beans.
-                registry.registerCustomEditor(Object.class, new StringTrimmerEditor(true));
-            }
+        PropertyEditorRegistrar propertyEditorRegistrar = registry -> {
+            //Trim strings before setting values on all form beans.
+            registry.registerCustomEditor(Object.class, new StringTrimmerEditor(true));
         };
 
         initializer.setPropertyEditorRegistrar(propertyEditorRegistrar);

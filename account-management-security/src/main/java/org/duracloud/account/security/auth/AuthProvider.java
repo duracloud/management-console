@@ -16,6 +16,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
@@ -33,7 +34,7 @@ public class AuthProvider extends DaoAuthenticationProvider {
     private final Logger log = LoggerFactory.getLogger(AuthProvider.class);
 
     public AuthProvider(UserDetailsService userDetailsService,
-                        Object passwordEncoder) {
+                        PasswordEncoder passwordEncoder) {
         super.setUserDetailsService(userDetailsService);
         super.setPasswordEncoder(passwordEncoder);
     }
@@ -74,7 +75,6 @@ public class AuthProvider extends DaoAuthenticationProvider {
         } else { // No user IP limits, which means all IPs are accepted
             log.debug("Allowing authentication check to continue for user " +
                       dcUser.getUsername() + " because no IP limits are defined");
-            return;
         }
     }
 

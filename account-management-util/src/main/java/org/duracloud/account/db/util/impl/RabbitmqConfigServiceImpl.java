@@ -11,6 +11,7 @@ import org.duracloud.account.db.model.RabbitmqConfig;
 import org.duracloud.account.db.repo.RabbitmqConfigRepo;
 import org.duracloud.account.db.util.RabbitmqConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,9 +35,9 @@ public class RabbitmqConfigServiceImpl implements RabbitmqConfigService {
     }
 
     @Override
+    @Nullable
     public RabbitmqConfig get(Long id) {
-        RabbitmqConfig entity = repo.findOne(id);
-        return entity;
+        return repo.findById(id).orElse(null);
     }
 
     @Override

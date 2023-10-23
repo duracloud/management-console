@@ -8,10 +8,12 @@
 package org.duracloud.account.db.util.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.persistence.EntityNotFoundException;
 
 import org.duracloud.account.db.model.AccountInfo;
 import org.duracloud.account.db.model.AccountRights;
@@ -44,11 +46,11 @@ import org.springframework.stereotype.Component;
 @Component("rootAccountManagerService")
 public class RootAccountManagerServiceImpl implements RootAccountManagerService {
 
-    private Logger log = LoggerFactory.getLogger(RootAccountManagerServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(RootAccountManagerServiceImpl.class);
 
-    private DuracloudRepoMgr repoMgr;
-    private DuracloudUserService userService;
-    private AccountChangeNotifier accountChangeNotifier;
+    private final DuracloudRepoMgr repoMgr;
+    private final DuracloudUserService userService;
+    private final AccountChangeNotifier accountChangeNotifier;
 
     @Autowired
     public RootAccountManagerServiceImpl(DuracloudRepoMgr duracloudRepoMgr,
@@ -64,10 +66,8 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         throws DBNotFoundException, UnsentEmailException {
         log.info("Resetting password for user with ID {}", userId);
 
-        DuracloudUser user = getUserRepo().findOne(userId);
-        if (user == null) {
-            throw new DBNotFoundException("User with ID: " + userId + " does not exist");
-        }
+        DuracloudUser user = getUserRepo().findById(userId)
+            .orElseThrow(() -> new DBNotFoundException("User with ID: " + userId + " does not exist"));
 
         try {
             userService.forgotPassword(user.getUsername(), user.getSecurityQuestion(), user.getSecurityAnswer());
@@ -87,7 +87,8 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         }
 
         // Remove user from all groups
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
+        DuracloudUser user = repoMgr.getUserRepo().findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User with ID: " + userId + " not found"));
         DuracloudGroupRepo groupRepo = getGroupRepo();
         List<DuracloudGroup> allGroups = groupRepo.findAll();
         for (DuracloudGroup group : allGroups) {
@@ -99,7 +100,7 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         }
 
         // Remove the user
-        getUserRepo().delete(userId);
+        getUserRepo().deleteById(userId);
 
         if (user.isRoot()) {
             notifyRootUsersChanged();
@@ -113,10 +114,10 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         log.info("Setting root on user with ID {}", userId);
 
         // Adding root from the user
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-        user.setRoot(true);
-        notifyRootUsersChanged();
-
+        repoMgr.getUserRepo().findById(userId).ifPresent((user) -> {
+            user.setRoot(true);
+            notifyRootUsersChanged();
+        });
     }
 
     @Override
@@ -124,9 +125,10 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
         log.info("Unsetting root on user with ID {}", userId);
 
         // Remove root from the user
-        DuracloudUser user = repoMgr.getUserRepo().findOne(userId);
-        user.setRoot(false);
-        notifyRootUsersChanged();
+        repoMgr.getUserRepo().findById(userId).ifPresent((user) -> {
+            user.setRoot(false);
+            notifyRootUsersChanged();
+        });
     }
 
     private void notifyUserChange(List<AccountRights> accountRights) {
@@ -185,27 +187,28 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
             getRightsRepo().save(rights);
         }
 
-        getRightsRepo().deleteInBatch(rightsList);
+        getRightsRepo().deleteAllInBatch(rightsList);
 
         // Delete the groups associated with the account
         DuracloudGroupRepo groupRepo = repoMgr.getGroupRepo();
         List<DuracloudGroup> groups = groupRepo.findByAccountId(accountId);
-        groupRepo.deleteInBatch(groups);
+        groupRepo.deleteAllInBatch(groups);
 
         // Delete any user invitations
         DuracloudUserInvitationRepo invRepo = repoMgr.getUserInvitationRepo();
-        invRepo.deleteInBatch(invRepo.findByAccountId(accountId));
+        invRepo.deleteAllInBatch(invRepo.findByAccountId(accountId));
 
         // Delete account
-        getAccountRepo().delete(accountId);
+        getAccountRepo().deleteById(accountId);
 
         notifyAccountChange(rightsList);
     }
 
     @Override
     public List<StorageProviderAccount> getSecondaryStorageProviders(Long accountId) {
-        AccountInfo account = repoMgr.getAccountRepo().findOne(accountId);
-        return new ArrayList(account.getSecondaryStorageProviderAccounts());
+        final var storageProviders = repoMgr.getAccountRepo().findById(accountId)
+            .map(AccountInfo::getSecondaryStorageProviderAccounts);
+        return new ArrayList<>(storageProviders.orElseGet(HashSet::new));
     }
 
     @Override
@@ -216,34 +219,38 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
                                      int storageLimit) {
         log.info("Setting up storage provider with ID {}", providerId);
 
-        StorageProviderAccount storageProviderAccount = getStorageRepo().findOne(providerId);
-        storageProviderAccount.setUsername(username);
-        storageProviderAccount.setPassword(password);
-        storageProviderAccount.getProperties().putAll(properties);
-        storageProviderAccount.setStorageLimit(storageLimit);
+        getStorageRepo().findById(providerId).ifPresent(storageProviderAccount -> {
+            storageProviderAccount.setUsername(username);
+            storageProviderAccount.setPassword(password);
+            storageProviderAccount.getProperties().putAll(properties);
+            storageProviderAccount.setStorageLimit(storageLimit);
 
-        getStorageRepo().save(storageProviderAccount);
-        notifyStorageProviderChange(getAccountByStorageProvider(providerId).getSubdomain());
+            getStorageRepo().save(storageProviderAccount);
+
+            notifyStorageProviderChange(getAccountByStorageProvider(providerId).getSubdomain());
+        });
     }
 
     @Override
     public AccountInfo getAccount(Long id) {
-        return getAccountRepo().findOne(id);
+        return getAccountRepo().findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("AccountInfo for ID: " + id + " not found"));
     }
 
     @Override
     public void activateAccount(Long accountId) {
         log.info("Activating account with ID {}", accountId);
-        AccountInfo accountInfo = getAccountRepo().findOne(accountId);
-        accountInfo.setStatus(AccountInfo.AccountStatus.ACTIVE);
-        getAccountRepo().save(accountInfo);
-        this.accountChangeNotifier.accountChanged(accountInfo.getSubdomain());
+        getAccountRepo().findById(accountId).ifPresent(accountInfo -> {
+            accountInfo.setStatus(AccountInfo.AccountStatus.ACTIVE);
+            getAccountRepo().save(accountInfo);
+            accountChangeNotifier.accountChanged(accountInfo.getSubdomain());
+        });
     }
 
     @Override
     public Set<AccountInfo> listAllAccounts(String filter) {
-        List<AccountInfo> accounts = getAccountRepo().findAll(new Sort("acctName"));
-        Set<AccountInfo> accountInfos = new LinkedHashSet<AccountInfo>();
+        List<AccountInfo> accounts = getAccountRepo().findAll(Sort.by("acctName"));
+        Set<AccountInfo> accountInfos = new LinkedHashSet<>();
         for (AccountInfo acct : accounts) {
             if (filter == null || acct.getOrgName().startsWith(filter)) {
                 accountInfos.add(acct);
@@ -254,8 +261,8 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
 
     @Override
     public Set<DuracloudUser> listAllUsers(String filter) {
-        List<DuracloudUser> usersList = getUserRepo().findAll(new Sort("username"));
-        Set<DuracloudUser> users = new LinkedHashSet<DuracloudUser>();
+        List<DuracloudUser> usersList = getUserRepo().findAll(Sort.by("username"));
+        Set<DuracloudUser> users = new LinkedHashSet<>();
         for (DuracloudUser user : usersList) {
             if (filter == null ||
                 (user.getUsername().startsWith(filter)
@@ -270,8 +277,8 @@ public class RootAccountManagerServiceImpl implements RootAccountManagerService 
 
     @Override
     public Set<DuracloudUser> listAllRootUsers(String filter) {
-        List<DuracloudUser> usersList = getUserRepo().findAll(new Sort("username"));
-        Set<DuracloudUser> users = new LinkedHashSet<DuracloudUser>();
+        List<DuracloudUser> usersList = getUserRepo().findAll(Sort.by("username"));
+        Set<DuracloudUser> users = new LinkedHashSet<>();
         for (DuracloudUser user : usersList) {
             if (user.isRoot() && (filter == null ||
                     (user.getUsername().startsWith(filter)

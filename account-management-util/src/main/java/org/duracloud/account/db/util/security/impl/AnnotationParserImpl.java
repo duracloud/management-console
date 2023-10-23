@@ -50,9 +50,9 @@ public class AnnotationParserImpl implements AnnotationParser {
 
         } catch (Exception e) {
             log.error("Error getting annotations {} over {}: {}",
-                      new Object[] {annotationClass.getName(),
-                                    targetClass.getName(),
-                                    e.getMessage()});
+                      annotationClass.getName(),
+                      targetClass.getName(),
+                      e.getMessage());
             throw new DuraCloudRuntimeException(e);
         }
     }

@@ -11,10 +11,11 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.duracloud.account.db.model.DuracloudMill;
 import org.duracloud.account.db.model.RabbitmqConfig;
@@ -65,11 +66,11 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testGetNoPreviousSettings() {
-        expect(repo.findAll()).andReturn(new ArrayList<DuracloudMill>());
+        expect(repo.findAll()).andReturn(new ArrayList<>());
         replayAll();
 
         DuracloudMill mill = subject.get();
-        assertTrue(mill == null);
+        assertNull(mill);
     }
 
     @Test
@@ -83,8 +84,8 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testSetNoPreviousSettings() {
-        expect(repo.findAll()).andReturn(new ArrayList<DuracloudMill>());
-        expect(rmqRepo.findOne(rabbitmqConfigId)).andReturn(rmqConf);
+        expect(repo.findAll()).andReturn(new ArrayList<>());
+        expect(rmqRepo.findById(rabbitmqConfigId)).andReturn(Optional.of(rmqConf));
         Capture<DuracloudMill> saveCapture = Capture.newInstance();
         expect(repo.save(EasyMock.capture(saveCapture))).andReturn(null);
         replayAll();
@@ -109,7 +110,7 @@ public class DuracloudMillConfigServiceImplTest extends EasyMockSupport {
         DuracloudMill entity = createMock(DuracloudMill.class);
         expect(repo.findAll()).andReturn(Arrays.asList(entity));
         RabbitmqConfig rmqEntity = createMock(RabbitmqConfig.class);
-        expect(rmqRepo.findOne(rabbitmqConfigId)).andReturn(rmqEntity);
+        expect(rmqRepo.findById(rabbitmqConfigId)).andReturn(Optional.of(rmqEntity));
         expect(repo.save(entity)).andReturn(entity);
 
         entity.setDbHost(host);
