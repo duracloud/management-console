@@ -5,7 +5,7 @@
   <groupId>org.duracloud</groupId>
   <artifactId>duracloud-mc</artifactId>
   <packaging>pom</packaging>
-  <version>7.3.0-SNAPSHOT</version>
+  <version>8.0.0</version>
   <name>DuraCloud Management Console</name>
   <description>Management console for the DuraCloud service</description>
   <url>https://duracloud.org</url>
